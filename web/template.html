@@ -120,6 +120,7 @@ table.plan tr.tot td{font-weight:800;border-top:1px solid #3b82f6;border-bottom:
 @keyframes bob{from{transform:translateY(0)}to{transform:translateY(-1.6px)}}
 .walker.rest .fig,.walker.rest .leg,.walker.rest .arm{animation:none}
 .walker.rest .a1{transform:rotate(-150deg)}.walker.rest .a2{transform:rotate(150deg)}
+.mtitle{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:4;background:linear-gradient(135deg,#0c4a6e,#14532d);border:1px solid #4ade8066;border-radius:12px;padding:8px 18px;text-align:center;box-shadow:0 8px 24px #0009;pointer-events:none}.mtitle b{display:block;font-size:17px;letter-spacing:.3px;color:#ecfeff}.mtitle span{font-size:12px;color:#bbf7d0}@media (max-width:900px){.mtitle{display:none}}
 .mopt{position:absolute;left:426px;top:14px;z-index:4;box-shadow:0 8px 24px #0009;transition:left .3s}.mopt button{padding:9px 13px;font-size:13px}
 aside{transition:transform .3s ease}.map{transition:left .3s ease}
 body.nopanel aside{transform:translateX(-100%)}body.nopanel .map{left:0}body.nopanel .mopt{left:16px}
@@ -210,6 +211,7 @@ body.nopanel aside{transform:translateX(-100%)}body.nopanel .map{left:0}body.nop
     <div class="card method" id="m1"></div>
   </aside>
   <div class="map" id="map1"></div>
+  <div class="mtitle"><b>❄ Madinah Cooling Map</b><span>Where street trees cool the city · <span id="mtsub"></span></span></div>
   <button class="ptog" title="Hide / show panel">◀</button>
   <div class="seg mopt" id="opt2"><button data-o="tree" class="on">🌳 Trees</button><button data-o="none">Off</button></div>
   <div class="legend" id="lg1"></div>
@@ -290,6 +292,9 @@ function mkMap(id){
 }
 function haramMarker(map,label){const el=document.createElement('div');el.className='haram';el.innerHTML=`<div class="hlabel">${label}</div>`;new maplibregl.Marker({element:el}).setLngLat(D.haram).addTo(map)}
 function addBoundary(map){map.addSource('bnd',{type:'geojson',data:D.bnd});
+  if(D.adm){map.addSource('adm',{type:'geojson',data:D.adm});
+    map.addLayer({id:'adm-fill',type:'fill',source:'adm',paint:{'fill-color':'#22c55e','fill-opacity':0.05}},'lbl');
+    map.addLayer({id:'adm-line',type:'line',source:'adm',paint:{'line-color':'#4ade80','line-width':['interpolate',['linear'],['zoom'],7,1.2,12,2.2],'line-opacity':0.9}})}
   map.addLayer({id:'bnd-glow',type:'line',source:'bnd',paint:{'line-color':'#38bdf8','line-width':6,'line-opacity':.18,'line-blur':4}});
   map.addLayer({id:'bnd',type:'line',source:'bnd',paint:{'line-color':'#7dd3fc','line-width':1.4,'line-dasharray':[3,2]}})}
 function distRows(el,rows,max){el.innerHTML=rows.map(r=>`<div class="drow"><span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${r.c};margin-right:6px"></span>${r.l}</span><div class="dbar"><div style="width:${Math.max(1,100*r.v/max)}%;background:${r.c}"></div></div><span class="n">${r.t}</span></div>`).join('')}
@@ -332,7 +337,7 @@ function applyUmbFilter(){if(!m1Ready)return;const f=['all',['in',['get','e'],['
     {v:fmt(P.summary.Walkway.km,0),u:'km',l:'Priority walkways needing shade (CPI High+)',k:'#2dd4bf'}]);
   $('cpiArea').textContent=fmt(Object.values(c).reduce((a,b)=>a+b,0))+' km² active';
   distRows($('d1'),[5,4,3,2,1].map(k=>({l:CPI_LBL[k],c:CPI_COL[k],v:S.cpi_counts[k],t:fmt(c[k],1)+' km²'})),Math.max(...Object.values(S.cpi_counts)));
-  countUp($('nU'),P.tot_umb);countUp($('nT'),P.tot_tree);
+  countUp($('nU'),P.tot_umb);countUp($('nT'),P.tot_tree);$('mtsub').textContent=`${fmt(P.tot_tree)} proposed shade trees · air up to ${fmt(Math.abs(P.air_dT),2)} °C cooler in High+ zones`;
   const rows=[['Mosque','Mosques'],['School','Schools'],['Bus','Bus stations'],['Mall','Shopping malls'],['Park','Parks'],['Walkway','Walkways'],['Junction','Road junctions'],['Crossing','Ped. crossings'],['StreetTree','Street trees (long‑term)']];
   let tu=0,tt=0,tm=0;
   $('nTs').textContent=`${fmt(P.site_tree)} at sites + ${fmt(P.street.n)} street`;
@@ -432,7 +437,7 @@ function syncShadeUI(){const u=shadeOpt==='umb'||shadeOpt==='both',t=shadeOpt===
   $('optTop').querySelectorAll('button').forEach(x=>{const on=t;x.classList.toggle('on',on);x.querySelector('i').textContent=on?'ON':'OFF'})}
 function applyShade(){if(!m1Ready)return;const u=shadeOpt==='umb'||shadeOpt==='both',t=shadeOpt==='tree'||shadeOpt==='both';
   ['umb','umb-dot'].forEach(l=>map1.setLayoutProperty(l,'visibility',u?'visible':'none'));
-  ['tree','stree'].forEach(l=>map1.setLayoutProperty(l,'visibility',t?'visible':'none'));
+  ['tree','stree','streeheat'].forEach(l=>map1.setLayoutProperty(l,'visibility',t?'visible':'none'));
   toast(shadeOpt==='none'?'Trees hidden':`${t?'🌳 '+fmt(P.tot_tree)+' trees':''}${map1.getZoom()<13.5?' · zoom in for exact spots':''}`)}
 function toggle1(k,on){if(!m1Ready)return;const v=on?'visible':'none';
   if(k==='pulse'){pulse1=on;return}
@@ -458,8 +463,7 @@ map1.on('load',()=>{
   map1.addLayer({id:'umbheat',type:'heatmap',source:'umb',maxzoom:14.5,layout:{visibility:'none'},paint:{'heatmap-radius':['interpolate',['linear'],['zoom'],9,4,14,18],'heatmap-intensity':['interpolate',['linear'],['zoom'],9,0.5,14,1.2],
     'heatmap-color':['interpolate',['linear'],['heatmap-density'],0,'rgba(0,0,0,0)',0.15,'rgba(14,116,144,.45)',0.4,'#22d3ee',0.7,'#a5f3fc',1,'#ffffff'],'heatmap-opacity':['interpolate',['linear'],['zoom'],12,0.85,14.5,0]}});
   map1.addSource('stree',{type:'geojson',data:STREE});
-  map1.addLayer({id:'streeheat',type:'heatmap',source:'stree',maxzoom:14.5,layout:{visibility:'none'},paint:{'heatmap-radius':['interpolate',['linear'],['zoom'],9,2,14,8],'heatmap-intensity':['interpolate',['linear'],['zoom'],9,0.02,12,0.05,14,0.2],
-    'heatmap-color':['interpolate',['linear'],['heatmap-density'],0,'rgba(0,0,0,0)',0.25,'rgba(21,128,61,.35)',0.6,'rgba(34,197,94,.6)',1,'rgba(134,239,172,.75)'],'heatmap-opacity':['interpolate',['linear'],['zoom'],12,0.8,14.5,0]}});
+  map1.addLayer({id:'streeheat',type:'heatmap',source:'stree',maxzoom:14.2,layout:{visibility:'none'},paint:{'heatmap-weight':0.35,'heatmap-radius':['interpolate',['linear'],['zoom'],9,3,11,5,13,9,14.2,12],'heatmap-intensity':['interpolate',['linear'],['zoom'],9,0.04,11,0.07,13,0.16,14.2,0.3],'heatmap-color':['interpolate',['linear'],['heatmap-density'],0,'rgba(0,0,0,0)',0.25,'rgba(0,0,0,0)',0.4,'rgba(22,163,74,.45)',0.6,'rgba(74,222,128,.75)',0.8,'#bbf7d0',1,'#f0fdf4'],'heatmap-opacity':['interpolate',['linear'],['zoom'],11,0.9,13.4,0.8,14.2,0]}});
   map1.addLayer({id:'stree',type:'circle',source:'stree',minzoom:13,layout:{visibility:'none'},paint:{'circle-radius':['interpolate',['exponential',2],['zoom'],13,1.2,15,1.4,17,3.77,22,120.8],'circle-color':TREE,'circle-opacity':0.45,'circle-stroke-color':'#bbf7d0','circle-stroke-width':['interpolate',['linear'],['zoom'],15,0,17,0.8]}});
   map1.addLayer({id:'tree',type:'circle',source:'trees_p',minzoom:12,layout:{visibility:'none'},paint:{'circle-radius':['interpolate',['exponential',2],['zoom'],12,2.2,15,2.4,17,3.77,22,120.8],'circle-color':TREE,'circle-opacity':0.55,'circle-stroke-color':'#bbf7d0','circle-stroke-width':1}});
   map1.addLayer({id:'umb',type:'circle',source:'umb',minzoom:12,layout:{visibility:'none'},paint:{'circle-radius':['interpolate',['exponential',2],['zoom'],12,1.8,15,2.8,17,5.19,22,166.1],'circle-color':['match',['get','e'],'j','#fbbf24','c','#fde047','w','#5eead4',UMB],'circle-opacity':0.35,'circle-stroke-color':'#e0f7ff','circle-stroke-width':['interpolate',['linear'],['zoom'],13,0.4,18,1.6]}});
@@ -492,6 +496,8 @@ $('lg1').innerHTML=`<h4>Cooling Priority Index</h4>${[5,4,3,2,1].map(k=>`<div cl
   <div class="lg"><span class="sw l" style="background:#5eead4"></span>Walkway / pedestrian zone</div><div class="lg"><span class="sw l" style="background:#fde047"></span>Road crossing (waiting in sun)</div>
   <div class="lg"><span class="sw" style="background:#4ade80;opacity:.6"></span>Park / green area</div>
   <div class="sep"></div><div class="lg"><span class="sw c" style="background:${TREE}99;border:1px solid #bbf7d0"></span>🌳 shade tree (53 m² crown)</div>
+  <div class="lg"><span class="sw" style="background:radial-gradient(#f0fdf4,#4ade80 45%,rgba(22,163,74,.2))"></span>🌳 tree hotspot (zoom in to see each tree)</div>
+  <div class="lg"><span class="sw" style="background:rgba(34,197,94,.08);border:2px solid #4ade80"></span>Madinah administrative boundary</div>
   <div class="sep"></div>${Object.values(CAT).map(v=>`<div class="lg"><span class="sw c" style="background:${v.c}"></span>${v.l}</div>`).join('')}
   <div id="lgtd" style="display:none"><div class="sep"></div><div style="font-size:11.5px;color:#d5dde8">🌳 Proposed trees per hectare</div><div class="ramp" style="background:linear-gradient(90deg,#ecfccb 0 20%,#bef264 20% 40%,#4ade80 40% 60%,#16a34a 60% 80%,#14532d 80%)"></div><div class="rampl"><span>&lt;2</span><span>2–5</span><span>5–10</span><span>10–20</span><span>20+</span></div></div>`;
 // hexagon colour mode

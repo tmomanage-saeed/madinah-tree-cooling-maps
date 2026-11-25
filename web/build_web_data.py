@@ -1077,6 +1077,7 @@ data = {"stats": stats, "hex": {"type": "FeatureCollection", "features": hex_fea
         "corr": {"type": "FeatureCollection", "features": corr_feats},
         "hot": {"type": "FeatureCollection", "features": hot_feats},
         "bnd": {"type": "FeatureCollection", "features": [bnd_feat]},
+        "adm": {"type": "FeatureCollection", "features": [{"type": "Feature", "properties": {}, "geometry": {"type": "Polygon", "coordinates": poly}} for (shp_,) in arcpy.da.SearchCursor(os.path.join(GDB, "Fallback_Boundary"), ["SHAPE@"], spatial_reference=SR_WGS) for poly in ring_coords(shp_.generalize(0.0003))]},   # administrative boundary
         "top": {"all": top(None, 25), "Mosque": top("Mosque", 10), "School": top("School", 10),
                 "Bus": top("Bus", 10), "Mall": top("Mall", 10), "Park": top("Park", 10)},
         "catch": {"type": "FeatureCollection", "features": catch_feats},
