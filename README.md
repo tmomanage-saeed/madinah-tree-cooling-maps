@@ -1,38 +1,38 @@
-# Madinah Heat Analysis: Cooling Priority & Pedestrian Movement (Tasks 5 & 6)
+# Madinah Heat Analysis: Cooling Priority & Street Trees (Tasks 5 & 6), v3
 
-This repo holds two interactive web maps built from open data (OpenStreetMap / Geofabrik) and a walking network model.
+This repo holds two interactive web maps built from open data: OpenStreetMap / Geofabrik, the Meta/WRI 1 m canopy height map, and a walking network model.
 
-**Open:** download `web/Madinah_Cooling_Pedestrian_Maps.html` and open it in Chrome. The basemap needs an internet connection.
+**Open:** download `web/Madinah_Cooling_Pedestrian_Maps.html` and open it in Chrome. The basemap (Esri World Imagery) needs an internet connection.
 
 ## Map 01: Priority Areas for Cooling (Task 5)
-- Cooling Priority Index on hexagons: 40% sensitive uses + 35% pedestrian movement + 25% shade deficit.
-- Sensitive uses include mosques, schools, bus stations, malls, parks, walkways and road junctions.
-- Each building has a 20 m cooling perimeter.
-- Umbrella suitability model on 8 m cells: 30% heat, 30% footfall, 20% sun exposure, 20% sidewalk access.
-- Cells on buildings, roads or under existing tree shade are excluded.
-- Action-Requirement Plan:
-  - Phase 1: ☂ 7,077 umbrellas (100 m² each). Minimum spacing is 14 m at sites, 50–60 m at crossings and junctions, and 100–220 m on walkways.
-  - Phase 2: 🌳 197,724 trees: 1,974 at sites and 195,750 street trees (200 m² canopy).
-  - Map 01 has a "Why these numbers?" table giving the basis for every rule.
+- **Grid:** 1 km cells, each a 500 m radius around its centre (843 cells).
+  - Built by area-weighted aggregation of the 250 m pedestrian movement grid (`make_cells_1km.py`).
+  - Shown as overlapping circles, dissolved per priority class.
+- **Cooling Priority Index:** 40 % sensitive uses + 35 % pedestrian movement + 25 % shade deficit.
+- **Tree crown:** 53 m² (about 8 m across), the mean of 40,800 single trees measured in Madinah on the Meta/WRI 1 m canopy height map (Tolan et al. 2024).
+- **Spacing by priority:** crown ÷ target kerb shade, on both kerbs of every walkable street.
+
+| Priority | Critical | Very High | High | Moderate | Low |
+|---|---|---|---|---|---|
+| Spacing | 8 m | 10 m | 12 m | 16 m | 24 m |
+
+- **Result:** 623,685 trees (611,871 street + 11,814 at sites). Air in High+ zones about 0.36 °C cooler when the trees are mature (0.33 °C per +10 % canopy).
+- **Click anywhere** for the full priority card: class, rank, score components, trees in the cell, spacing and cooling.
+- **"Trees per hectare" view** shows the planting density at city scale.
 
 ## Map 02: Pedestrian Movement (Task 6)
-- Pedestrian Movement Index with hotspots and animated corridors.
-- 700 pedestrians walk to Masjid an-Nabawi and 4,989 walk across the city to their nearest mosque, school, bus stop, mall or park. All follow real shortest paths.
-- 5/10/15-min walking catchments, with minute labels on the network.
-- A→B tool:
-  - Compares the fastest route with a cool route.
-  - Shows ☂ shade stops and the longest walk in the sun.
-  - Builds a route shade plan: a new umbrella wherever there is ≥100 m without shade, and trees every 10 m on both kerbs.
-  - Lists mosques, malls, parks and bus stops along the way.
-- Validated against PedestrianCatch: median difference 0.79 min, 93.8% within ±2 min.
+- Pedestrian Movement Index, animated corridors.
+- 700 pedestrians walk to Masjid an-Nabawi and 4,989 walk across the city.
+- 5/10/15-min walking catchments.
+- A→B tool: fastest vs. cool route, 🌳 shade stops, and a route tree plan (tree every 8 m).
+- Validated against PedestrianCatch: median difference 0.79 min, 93.8 % within ±2 min.
 
 ## Files
 | File | Purpose |
 |---|---|
 | `web/Madinah_Cooling_Pedestrian_Maps.html` | Final deliverable (data embedded) |
 | `web/template.html` | Map UI (MapLibre GL) |
-| `web/build_web_data.py` | ArcGIS Pro (arcpy) pipeline: CPI, suitability, umbrellas/trees, network model |
-| `web/inject.py` | Puts the data into the template, for UI-only changes |
-| `Action_Requirement_Plan.csv` | Site-by-site umbrellas / trees |
-
-The analysis layers live in `Madinah_Analysis.gdb`, which is not in the repo because of its size.
+| `web/build_web_data.py` | ArcGIS Pro (arcpy) pipeline |
+| `web/make_cells_1km.py` | 1 km cell grid from the 250 m grid |
+| `web/inject.py` | Puts the data into the template |
+| `Action_Requirement_Plan.csv` | Site-by-site table |

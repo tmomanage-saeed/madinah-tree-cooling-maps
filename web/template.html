@@ -159,7 +159,7 @@ body.nopanel aside{transform:translateX(-100%)}body.nopanel .map{left:0}body.nop
     <button class="tab" data-v="v2"><i>02</i>Pedestrian Movement</button>
   </div>
   <div class="tools">
-    <div class="seg" id="base"><button class="on" data-b="dark">Dark</button><button data-b="sat">Satellite</button></div>
+    <div class="seg" id="base"><button data-b="dark">Dark</button><button class="on" data-b="sat">Satellite</button></div>
     <button class="btn" id="b3d">3D</button>
     <button class="btn hide-s" id="btour">▶ Tour</button>
     <button class="btn hide-s" id="bpng">⤓ PNG</button>
@@ -174,30 +174,31 @@ body.nopanel aside{transform:translateX(-100%)}body.nopanel .map{left:0}body.nop
     <ul class="pts">
       <li><b>Where:</b> mosques · schools · bus · malls · parks · walkways · junctions</li>
       <li><b>Zone:</b> 20 m cooling perimeter around each building</li>
-      <li><b>Phase 1 (now):</b> ☂ umbrellas · <b>Phase 2 (long‑term):</b> 🌳 trees</li>
+      <li><b>🌳 Trees on every street:</b> more trees where cooling priority is higher</li>
+      <li><b>Crown 53 m²</b>: mean of 40,800 trees measured in Madinah</li>
     </ul>
-    <div class="onoff" id="optTop"><button data-t="umb" class="on">☂ Umbrellas <i>ON</i></button><button data-t="tree">🌳 Trees <i>OFF</i></button></div>
+    <div class="onoff" id="optTop"><button data-t="tree" class="on">🌳 Trees <i>ON</i></button></div>
     <div class="kpis" id="k1"></div>
     <h3>Cooling Priority Index <span id="cpiArea"></span></h3>
     <div class="card dist" id="d1"></div>
+    <div class="subtabs" id="hexmode" style="margin-top:8px"><button data-h="cpi" class="on">🔥 Cooling priority</button><button data-h="tree">🌳 Trees per hectare</button></div>
     <h3>Action‑Requirement Plan <button class="btn" id="bcsv" style="padding:4px 8px;font-size:11px">⤓ CSV</button></h3>
     <div class="card">
       <div class="big2">
-        <div style="background:linear-gradient(135deg,#0e3a4a,#103040)"><b id="nU">0</b><span>☂ Umbrellas · Phase 1<br>100 m² shade each</span></div>
-        <div style="background:linear-gradient(135deg,#123d24,#0f2e1d)"><b id="nT">0</b><span>🌳 Trees · Phase 2<br><span id="nTs"></span></span></div>
+        <b id="nU" style="display:none">0</b>
+        <div style="background:linear-gradient(135deg,#123d24,#0f2e1d)"><b id="nT">0</b><span>🌳 Trees · 53 m² crown<br><span id="nTs"></span></span></div>
       </div>
-      <div class="subtabs" id="opt"><button data-o="umb" class="on">☂ Umbrellas</button><button data-o="tree">🌳 Trees</button><button data-o="both">☂ + 🌳 Both</button><button data-o="none">Hide</button></div>
+      <div class="subtabs" id="opt"><button data-o="tree" class="on">🌳 Show trees</button><button data-o="none">Hide</button></div>
       <table class="plan" id="ptab"></table>
-      <div class="rng">Min. suitability <input type="range" id="smin" min="55" max="95" step="5" value="55"><b id="sminv" style="color:#fff;min-width:74px;text-align:right">all</b></div>
+      <div style="display:none"><input type="range" id="smin" min="55" max="95" step="5" value="55"><b id="sminv"></b></div>
       <div class="note" id="pnote"></div>
     </div>
-    <h3>Why here? · Umbrella suitability</h3>
-    <div class="card method" id="suitbox"></div>
+    <div id="suitbox" style="display:none"></div>
     <h3>Expected cooling effect</h3>
     <div class="card method" id="eff"></div>
     <h3>Layers</h3>
     <div class="chips" id="cat1"></div>
-    <div class="chips" id="uel" style="margin-top:8px"></div>
+    <div id="uel" style="display:none"></div>
     <div class="toggles" style="margin-top:10px" id="t1"></div>
     <h3>Top priority sites</h3>
     <input class="srch" id="q1" placeholder="🔎 Search any mosque / school / mall / park…" dir="auto">
@@ -210,7 +211,7 @@ body.nopanel aside{transform:translateX(-100%)}body.nopanel .map{left:0}body.nop
   </aside>
   <div class="map" id="map1"></div>
   <button class="ptog" title="Hide / show panel">◀</button>
-  <div class="seg mopt" id="opt2"><button data-o="umb" class="on">☂ Umbrellas</button><button data-o="tree">🌳 Trees</button><button data-o="both">Both</button><button data-o="none">Off</button></div>
+  <div class="seg mopt" id="opt2"><button data-o="tree" class="on">🌳 Trees</button><button data-o="none">Off</button></div>
   <div class="legend" id="lg1"></div>
 </section>
 
@@ -230,8 +231,8 @@ body.nopanel aside{transform:translateX(-100%)}body.nopanel .map{left:0}body.nop
       <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn" id="broute">✚ Pick A → B</button><button class="btn" id="bcool">🚶 Nearest cool spot</button><button class="btn" id="brclr">Clear</button></div>
       <div id="rinfo" class="method" style="margin-top:8px;color:var(--mut)"><ul class="pts" style="margin:0">
         <li><b>Pick A → B:</b> fastest vs. cool route + minute markers</li>
-        <li><b>Nearest cool spot:</b> walker goes to the closest ☂ umbrella</li>
-        <li>☂ shade stops: walker rests under proposed umbrellas</li></ul></div>
+        <li><b>Nearest cool spot:</b> walker goes to the closest shaded forecourt or park</li>
+        <li>🌳 shade stops: walker rests under proposed trees</li></ul></div>
     </div>
     <h3>Walking catchment from…</h3>
     <div class="card">
@@ -257,6 +258,7 @@ body.nopanel aside{transform:translateX(-100%)}body.nopanel .map{left:0}body.nop
 
 <script>
 const D = /*__DATA__*/null;
+if(innerWidth>900)document.body.classList.add('nopanel');
 const S = D.stats, P = D.plan;
 const CPI_COL={1:'#3a4a63',2:'#f4c95d',3:'#f59342',4:'#e4473c',5:'#c0134f'};
 const CPI_LBL={1:'Low',2:'Moderate',3:'High',4:'Very High',5:'Critical'};
@@ -276,14 +278,14 @@ function baseStyle(){return{version:8,glyphs:'https://demotiles.maplibre.org/fon
   dark:{type:'raster',tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'],tileSize:256,maxzoom:16,attribution:'Basemap © Esri, HERE, Garmin, © OpenStreetMap contributors'},
   sat:{type:'raster',tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],tileSize:256,maxzoom:19,attribution:'Imagery © Esri, Maxar, Earthstar Geographics'},
   lbl:{type:'raster',tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}'],tileSize:256,maxzoom:16}},
-  layers:[{id:'bg',type:'background',paint:{'background-color':'#0b1016'}},{id:'dark',type:'raster',source:'dark'},
-          {id:'sat',type:'raster',source:'sat',layout:{visibility:'none'},paint:{'raster-saturation':-0.3,'raster-brightness-max':0.8}}]}}
+  layers:[{id:'bg',type:'background',paint:{'background-color':'#0b1016'}},{id:'dark',type:'raster',source:'dark',layout:{visibility:'none'}},
+          {id:'sat',type:'raster',source:'sat',layout:{visibility:'visible'},paint:{'raster-saturation':-0.3,'raster-brightness-max':0.8}}]}}
 const bbox=(()=>{let a=[180,90,-180,-90];D.bnd.features[0].geometry.coordinates.forEach(p=>p[0].forEach(([x,y])=>{a[0]=Math.min(a[0],x);a[1]=Math.min(a[1],y);a[2]=Math.max(a[2],x);a[3]=Math.max(a[3],y)}));return a})();
 function mkMap(id){
   const m=new maplibregl.Map({container:id,style:baseStyle(),bounds:bbox,fitBoundsOptions:{padding:30},attributionControl:{compact:true},preserveDrawingBuffer:true,maxPitch:70});
   m.addControl(new maplibregl.NavigationControl({visualizePitch:true}),'top-right');
   m.addControl(new maplibregl.ScaleControl({unit:'metric'}),'bottom-left');
-  m.on('load',()=>m.addLayer({id:'lbl',type:'raster',source:'lbl',paint:{'raster-opacity':0.85}}));
+  m.on('load',()=>m.addLayer({id:'lbl',type:'raster',source:'lbl',paint:{'raster-opacity':0.6}}));
   return m;
 }
 function haramMarker(map,label){const el=document.createElement('div');el.className='haram';el.innerHTML=`<div class="hlabel">${label}</div>`;new maplibregl.Marker({element:el}).setLngLat(D.haram).addTo(map)}
@@ -297,12 +299,14 @@ function countUp(el,to){const t0=performance.now();const f=n=>{const r=Math.min(
 
 // hex lookup (nearest centroid = containing hexagon)
 const HX=D.hex.features.map(f=>{const r=f.geometry.coordinates[0];let x=0,y=0;const n=r.length-1;for(let i=0;i<n;i++){x+=r[i][0];y+=r[i][1]}return[x/n,y/n,f.properties]});
-const HG=new Map(),HC=0.004;HX.forEach((h,i)=>{const k=Math.floor(h[0]/HC)+','+Math.floor(h[1]/HC);(HG.get(k)||HG.set(k,[]).get(k)).push(i)});
-function hexAt(lon,lat){let best=null,bd=1e9;const cx=Math.floor(lon/HC),cy=Math.floor(lat/HC);for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){(HG.get((cx+a)+','+(cy+b))||[]).forEach(i=>{const h=HX[i],d=(h[0]-lon)**2+(h[1]-lat)**2;if(d<bd){bd=d;best=h}})}return bd<0.0000025?best[2]:null}
+// draw each 1 km grid cell as a circle (500 m radius from the centre, drawn at 490 m so neighbours do not touch) around its centre; values are unchanged
+const CELL_R=490;D.hex.features.forEach((f,i)=>{const [cx,cy]=HX[i],ring=[];for(let k=0;k<=32;k++){const a=2*Math.PI*k/32;ring.push([cx+CELL_R*Math.cos(a)/101200,cy+CELL_R*Math.sin(a)/110900])}f.geometry={type:'Polygon',coordinates:[ring]}});
+const HG=new Map(),HC=0.008;HX.forEach((h,i)=>{const k=Math.floor(h[0]/HC)+','+Math.floor(h[1]/HC);(HG.get(k)||HG.set(k,[]).get(k)).push(i)});
+function hexAt(lon,lat){let best=null,bd=1e9;const cx=Math.floor(lon/HC),cy=Math.floor(lat/HC);for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){(HG.get((cx+a)+','+(cy+b))||[]).forEach(i=>{const h=HX[i],d=(h[0]-lon)**2+(h[1]-lat)**2;if(d<bd){bd=d;best=h}})}return bd<0.000034?best[2]:null}
 
 // ===================== MAP 1 =====================
 const map1=mkMap('map1');
-let m1Ready=false,cat1On=new Set(Object.keys(CAT)),topCat='all',pulse1=true,shadeOpt='umb',uelOn=new Set(['p','j','c','w']),sMin=55;
+let m1Ready=false,cat1On=new Set(Object.keys(CAT)),topCat='all',pulse1=false,shadeOpt='tree',uelOn=new Set(['p','j','c','w']),sMin=55;
 // suitability cells + minute labels (compact arrays -> GeoJSON)
 const SUIT={type:'FeatureCollection',features:[]};{const o=D.suit.o,p=D.suit.p;for(let i=0;i<p.length;i+=3)SUIT.features.push({type:'Feature',properties:{s:p[i+2]},geometry:{type:'Point',coordinates:[o[0]+p[i]/1e5,o[1]+p[i+1]/1e5]}})}
 const CMIN={type:'FeatureCollection',features:[]};{const o=D.cmin.o,p=D.cmin.p,K='hbmsl';for(let i=0;i<p.length;i+=4)CMIN.features.push({type:'Feature',properties:{m:p[i+2],k:K[p[i+3]]},geometry:{type:'Point',coordinates:[o[0]+p[i]/1e5,o[1]+p[i+1]/1e5]}})}
@@ -332,36 +336,35 @@ function applyUmbFilter(){if(!m1Ready)return;const f=['all',['in',['get','e'],['
   const rows=[['Mosque','Mosques'],['School','Schools'],['Bus','Bus stations'],['Mall','Shopping malls'],['Park','Parks'],['Walkway','Walkways'],['Junction','Road junctions'],['Crossing','Ped. crossings'],['StreetTree','Street trees (long‑term)']];
   let tu=0,tt=0,tm=0;
   $('nTs').textContent=`${fmt(P.site_tree)} at sites + ${fmt(P.street.n)} street`;
-  $('ptab').innerHTML='<tr><th>Element</th><th>Count</th><th>☂ Phase 1</th><th>🌳 Phase 2</th></tr>'+rows.map(([k,l])=>{const r=P.summary[k];if(!r)return'';tu+=r.umb;tt+=r.tree;
-     const n=(k==='Walkway'||k==='StreetTree')?fmt(r.km,0)+' km':fmt(r.sites);return`<tr><td>${l}</td><td>${n}</td><td>${r.umb?fmt(r.umb):'–'}</td><td>${r.tree?fmt(r.tree):'–'}</td></tr>`}).join('')+
-     `<tr class="tot"><td>Total</td><td></td><td>${fmt(tu)}</td><td>${fmt(tt)}</td></tr>`;
+  const TI=P.tiers||{},TL={5:'Critical',4:'Very High',3:'High',2:'Moderate',1:'Low',0:'Outside index'};
+  let tn=0,tk=0;
+  $('ptab').innerHTML='<tr><th>Priority</th><th>Tree every</th><th>Kerb shade</th><th>Street km</th><th>🌳 Trees</th></tr>'+[5,4,3,2,1,0].map(c=>{const r=TI[c];if(!r)return'';tn+=r.n;tk+=r.km;
+     return`<tr><td><span class="d" style="display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;background:${CPI_COL[c]||'#64748b'}"></span>${TL[c]}</td><td>${fmt(r.sp,0)} m</td><td>${fmt(100*P.tree_sp/r.sp,0)} %</td><td>${fmt(r.km,0)}</td><td>${fmt(r.n)}</td></tr>`}).join('')+
+     `<tr class="tot"><td>Total</td><td></td><td></td><td>${fmt(tk,0)}</td><td>${fmt(tn)}</td></tr>`;
   const zeroLow=Object.values(P.site).filter(v=>v[0]===0&&!v[3]).length,noSpace=Object.values(P.site).filter(v=>v[0]===0&&/^No suitable/.test(v[3])).length,inHaram=Object.values(P.site).filter(v=>v[0]===0&&/Haram/.test(v[3])).length,J=P.summary.Junction;
   $('pnote').innerHTML=`<ul class="pts" style="margin:0;font-size:11.5px">
-    <li><b>Phase 1 ☂</b> = quick shade now (100 m² each). <b>Phase 2 🌳</b> = permanent shade (200 m² crown each).</li>
-    <li>At sites, 1 tree later replaces 2 umbrellas. Street trees are <b>extra</b>, along streets.</li>
-    <li>☂ only on open, suitable spots (score ≥ ${D.suit_w.min}), never on a building or road, ${D.suit_w.spacing} m apart.</li>
-    <li>Walkways: at most 1 ☂ per 100 / 150 / 220 m (Critical / Very High / High), counting ☂ already nearby.</li>
-    <li>Junctions: ${fmt(J.umb)} of ${fmt(J.sites)} get a corner ☂. ${fmt(J.covered)} already have a ☂ within 60 m, ${fmt(J.nospace)} have no open corner.</li>
-    <li>Pedestrian crossings (Critical zone): ${fmt(P.summary.Crossing.umb)} of ${fmt(P.summary.Crossing.sites)} waiting points get a ☂. The rest already have a ☂ within 50 m or no open kerb.</li>
-    <li>${fmt(zeroLow)} low‑priority sites (bottom 25 %) get none: heat and footfall are low there. ${noSpace} more sites have no open space around them (buildings / roads).</li>
-    <li>Masjid an‑Nabawi and its plaza (420 m): not counted, large umbrellas already exist (${inHaram} sites inside).</li>
-    <li>Street trees: both sides of every walkable street in High+ zones, every ${D.plan.street.sp} m.</li></ul>`;
+    <li><b>🌳 Crown 53 m²</b> (≈ 8 m across): mean of 40,800 single trees measured in Madinah (Meta/WRI 1 m canopy map).</li>
+    <li><b>Spacing</b> = 8 m crown ÷ target kerb shade: Critical 8 m (crowns touch) → Low 24 m.</li>
+    <li>Trees counted include ${fmt(P.site_tree)} at mosques, schools, bus, malls, parks and walkways.</li>
+    <li>Trees on the kerb strip (road half‑width + 2.5 m), never on a building, road or junction corner (12 m).</li>
+    <li>Masjid an‑Nabawi and its plaza (420 m): no new trees, the plaza is already shaded.</li>
+    </ul>`;
   const SW=D.suit_w;
-  $('suitbox').innerHTML=`<div class="formula">S = ${SW.heat}% Heat + ${SW.foot}% Footfall<br>&nbsp;&nbsp;+ ${SW.sun}% Sun exposure + ${SW.access}% Access</div>
+  $('suitbox').innerHTML='';const _sb=`<div class="formula">S = ${SW.heat}% Heat + ${SW.foot}% Footfall<br>&nbsp;&nbsp;+ ${SW.sun}% Sun exposure + ${SW.access}% Access</div>
     <ul class="pts" style="margin:0"><li><b>Heat</b>: cooling priority (CPI) of the spot</li><li><b>Footfall</b>: pedestrian index + waiting (gate, stop, crossing)</li>
     <li><b>Sun</b>: west / south side of building hottest at 15:00</li><li><b>Access</b>: on the sidewalk, ≤ 4 m from walkable edge</li>
     <li>❌ Not on buildings, roads, existing tree shade</li></ul>
     <div class="ramp" style="background:linear-gradient(90deg,#334155,#f59e0b 45%,#22d3ee 75%,#a5f3fc)"></div><div class="rampl"><span>35 low</span><span>55 suitable</span><span>100 best</span></div>
     <div class="note">Zoom in (z15+) to see the 8 m suitability cells; click any ☂ to see <b>why it is there</b>.</div>`;
-  $('eff').innerHTML=`<div class="kpis" style="margin:0 0 8px"><div class="kpi" style="--k:#22c55e"><div class="v">${fmt(P.shade_pct)}<small>%</small></div><div class="l">of busy pedestrian spaces (forecourts, walkways, crossings, junctions) shaded by ☂ in Phase 1</div></div>
-    <div class="kpi" style="--k:#38bdf8"><div class="v">↓ ${fmt(Math.abs(P.air_dT),2)}<small>°C cooler</small></div><div class="l">cooler air in High+ zones (${fmt(P.hot_km2,0)} km²) after Phase 2: +${fmt(P.canopy_pp,0)} % tree canopy × 0.33 °C per 10 % (WRI)</div></div></div>
-    <ul class="pts" style="margin:0"><li>Under a ☂ or 🌳 the <b>felt heat</b> drops much more than the air, because direct sun is blocked.</li><li><b>Next:</b> SOLWEIG before/after UTCI at top sites</li></ul>`;
+  $('eff').innerHTML=`<div class="kpis" style="margin:0 0 8px"><div class="kpi" style="--k:#38bdf8"><div class="v">↓ ${fmt(Math.abs(P.air_dT),2)}<small>°C cooler</small></div><div class="l">air in High+ zones (${fmt(P.hot_km2,0)} km²) when the trees are mature: +${fmt(P.canopy_pp,1)} % canopy × 0.33 °C per 10 % (WRI)</div></div></div>
+    <table class="plan"><tr><th>Priority</th><th>Canopy added</th><th>Air cooler</th></tr>${[5,4,3,2,1].map(c=>{const r=(P.tiers||{})[c];return r?`<tr><td>${TL[c]}</td><td>+${fmt(r.canopy_pp,1)} %</td><td>${fmt(Math.abs(r.dT),2)} °C</td></tr>`:''}).join('')}</table>
+    <ul class="pts" style="margin:6px 0 0"><li>Under a 🌳 the <b>felt heat</b> drops much more than the air, because direct sun is blocked.</li><li><b>Next:</b> SOLWEIG before/after UTCI at top sites</li></ul>`;
   ['opt','opt2'].forEach(id=>$(id).querySelectorAll('button').forEach(b=>b.onclick=()=>{shadeOpt=b.dataset.o;syncShadeUI();applyShade()}));
   $('optTop').querySelectorAll('button').forEach(b=>b.onclick=()=>{let u=shadeOpt==='umb'||shadeOpt==='both',t=shadeOpt==='tree'||shadeOpt==='both';
-    if(b.dataset.t==='umb')u=!u;else t=!t;shadeOpt=u&&t?'both':u?'umb':t?'tree':'none';syncShadeUI();applyShade()});
+    t=!t;shadeOpt=t?'tree':'none';syncShadeUI();applyShade()});
   $('cat1').innerHTML=Object.entries(CAT).map(([k,v])=>`<div class="chip" data-c="${k}"><span class="d" style="background:${v.c}"></span>${v.l} <span style="color:var(--mut)">${fmt(S.cats[k].n)}</span></div>`).join('');
   $('cat1').querySelectorAll('.chip').forEach(ch=>ch.onclick=()=>{const k=ch.dataset.c;cat1On.has(k)?cat1On.delete(k):cat1On.add(k);ch.classList.toggle('off');applyCat1()});
-  const T=[['hex1','Cooling Priority Index (hexagons)',1],['suit','Umbrella suitability cells (zoom 15+)',1],['umbheat','Umbrella density (city view)',1],['perim','Cooling perimeters',1],['fp','Building footprints',1],['walk1','Walkways / plazas',1],['parks1','Parks',1],['cross1','Ped. crossings',1],['pulse','Animate critical zones',1]];
+  const T=[['hex1','Cooling Priority Index (1 km cells)',1],['perim','Cooling perimeters',1],['fp','Building footprints',1],['walk1','Walkways / plazas',1],['parks1','Parks',1],['cross1','Ped. crossings',1]];
   $('t1').innerHTML=T.map(([k,l,on])=>`<label class="tg"><input type="checkbox" data-k="${k}" ${on?'checked':''}>${l}</label>`).join('');
   const UEL={p:['Perimeter','#67e8f9'],j:['Junction','#fbbf24'],c:['Crossing','#fde047'],w:['Walkway','#5eead4']};
   const uc={};D.umb.features.forEach(f=>uc[f.properties.e]=(uc[f.properties.e]||0)+1);
@@ -375,14 +378,11 @@ function applyUmbFilter(){if(!m1Ready)return;const f=['all',['in',['get','e'],['
   $('st1').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('st1').querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');topCat=b.dataset.k;renderTop()});
   renderTop();
   $('why1').innerHTML=`<table class="plan"><tr><th>Rule</th><th>Value</th><th>Basis</th></tr>
-    <tr><td>Umbrella size</td><td>100 m²</td><td>Project brief</td></tr>
-    <tr><td>Tree canopy</td><td>200 m²</td><td>Project brief (mature tree, ~16 m crown)</td></tr>
-    <tr><td>☂ to ☂ at a site</td><td>14 m</td><td>10 m canopy + 4 m walking gap</td></tr>
-    <tr><td>☂ at junction / crossing</td><td>≥ 60 / 50 m apart</td><td>One waiting point per corner group; no duplicates</td></tr>
-    <tr><td>☂ on walkway</td><td>100 / 150 / 220 m</td><td>Planning assumption: ≤ 1.5 / 2.3 / 3.3 min in sun at 1.1 m/s</td></tr>
-    <tr><td>Street trees</td><td>every 15 m, both kerbs</td><td>16 m crowns touch, so shade is continuous</td></tr>
+    <tr><td>Tree crown</td><td>53 m² (≈ 8 m)</td><td>Measured: mean of 40,800 single tree crowns in Madinah, Meta/WRI 1 m canopy height map (Tolan et al. 2024). Median 28 m², middle half 13–64 m².</td></tr>
+    <tr><td>Species</td><td>Neem, Sidr, Ficus, Tabebuia</td><td>Species Madinah Municipality allocated for streets (Al‑Watan, 24 Oct 2021); Sidr and Ficus also on the MEWA native list. Neem crown up to 10 m (World Agroforestry).</td></tr>
+    <tr><td>Tree spacing</td><td>8 / 10 / 12 / 16 / 24 m</td><td>8 m crown ÷ target kerb shade (100 / 80 / 67 / 50 / 33 %) for Critical → Low. Target shares are a planning assumption.</td></tr>
+    <tr><td>Junction corner</td><td>no tree within 12 m</td><td>Keeps the sight triangle clear for drivers</td></tr>
     <tr><td>Haram plaza</td><td>420 m excluded</td><td>Existing large umbrellas already shade it</td></tr>
-    <tr><td>Suitability weights</td><td>30/30/20/20</td><td>Planning assumption, can be changed in the script</td></tr>
     <tr><td>Walking speed</td><td>1.1 m/s</td><td>Checked against PedestrianCatch: ±2 min for 94 % of points</td></tr>
     <tr><td>Air cooling</td><td>0.33 °C / +10 % canopy</td><td>WRI / Engel et al. 2026</td></tr></table>
     <div class="note">All rules are in <code>build_web_data.py</code>. Change a value and re-run to get new counts.</div>`;
@@ -392,6 +392,17 @@ function applyUmbFilter(){if(!m1Ready)return;const f=['all',['in',['get','e'],['
    <li><b>Perimeter</b>: 20 m ring outside each OSM footprint</li></ul>
    <div class="note">OSM: only ${fmt(S.trees)} trees mapped. <b>Next:</b> plug in Task 1 NDVI/LCC + Task 2–4 LST.</div>`;
 })();
+// full priority card for one 1 km cell
+const VSORT=D.hex.features.map(f=>f.properties.v).filter(v=>v>0).sort((a,b)=>b-a);
+function priorityCard(p){const TI=(P.tiers||{})[p.c]||{},rk=VSORT.findIndex(v=>v<=p.v)+1,top=Math.max(1,Math.round(100*rk/VSORT.length)),n=Math.round(p.t*86.6);
+  const row=(l,v)=>`<div style="display:flex;justify-content:space-between;margin-top:3px"><span>${l}</span><b>${v}</b></div>`;
+  return`<h5>Cooling priority: <span style="color:${CPI_COL[p.c]}">${CPI_LBL[p.c]}</span></h5>
+   <div class="s">1 km cell · CPI ${(+p.v).toFixed(2)} · rank ${fmt(rk)} of ${fmt(VSORT.length)} (top ${top} %)</div>
+   <div style="font-size:11.5px;color:var(--mut);margin-top:6px">Why: CPI = 40 % sensitive uses + 35 % pedestrians + 25 % shade deficit</div>
+   ${bar('Sensitive uses (40 %)',p.s,'#2dd4bf')}${bar('Pedestrian movement (35 %)',p.p,'#ffd166')}${bar('Shade deficit (25 %)',p.sh,'#f59342')}
+   <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:12px"><b>🌳 Tree plan for this cell</b>
+   ${row('Proposed trees',fmt(n)+' ('+fmt(p.t,1)+' / ha)')}${row('Tree every',fmt(TI.sp||0,0)+' m, both kerbs')}${row('Kerb shade when mature',fmt(100*P.tree_sp/(TI.sp||1),0)+' %')}
+   ${row('Air cooler ('+CPI_LBL[p.c]+' zones)',fmt(Math.abs(TI.dT||0),2)+' °C')}</div>`}
 function renderTop(){
   const q=($('q1').value||'').trim().toLowerCase();
   const arr=q?D.sites.features.map(f=>({...f.properties,lon:f.geometry.coordinates[0],lat:f.geometry.coordinates[1]})).filter(s=>(topCat==='all'||s.cat===topCat)&&((s.name||'').toLowerCase().includes(q)||CAT[s.cat].l.toLowerCase().includes(q))).sort((a,b)=>b.score-a.score).slice(0,40):(D.top[topCat]||[]);
@@ -409,7 +420,7 @@ function sitePopup(p,ll){
   new maplibregl.Popup({maxWidth:'310px'}).setLngLat(ll).setHTML(`<div class="pp"><h5 class="${isAr(p.name)?'ar':''}" dir="auto">${esc(p.name||'Unnamed '+p.cat.toLowerCase())}</h5>
    <div class="s">${CAT[p.cat].l} · tier <b style="color:${CPI_COL[p.c]}">${CPI_LBL[p.c]}</b> · score ${p.score}</div>
    ${bar('Cooling (CPI)',p.v,CPI_COL[p.c])}${bar('Pedestrian (PMI)',p.p,'#ffd166')}${bar('Shade deficit',p.sh,'#f59342')}
-   ${pl?`<div class="act"><span>☂ <b>${pl.umbrellas}</b> umbrellas</span><span>🌳 <b>${pl.trees}</b> trees</span><span style="color:var(--mut)">${fmt(pl.suit_m2)} m² suitable</span></div>${pl.note?`<div class="s" style="margin-top:6px">${esc(pl.note)}</div>`:''}`:''}
+   ${pl?`<div class="act"><span>🌳 <b>${pl.trees}</b> trees at this site</span></div>${pl.note&&!/umbrella/i.test(pl.note)?`<div class="s" style="margin-top:6px">${esc(pl.note)}</div>`:''}`:''}
    ${timesHTML(walkTimes({lng:ll[0],lat:ll[1]}))}</div>`).addTo(map1);
 }
 function applyCat1(){if(!m1Ready)return;const f=['in',['get','cat'],['literal',[...cat1On]]];
@@ -417,46 +428,48 @@ function applyCat1(){if(!m1Ready)return;const f=['in',['get','cat'],['literal',[
   map1.setLayoutProperty('parks1','visibility',cat1On.has('Park')&&$('t1').querySelector('[data-k=parks1]').checked?'visible':'none')}
 function syncShadeUI(){const u=shadeOpt==='umb'||shadeOpt==='both',t=shadeOpt==='tree'||shadeOpt==='both';
   ['opt','opt2'].forEach(j=>$(j).querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.o===shadeOpt)));
-  $('optTop').querySelectorAll('button').forEach(x=>{const on=x.dataset.t==='umb'?u:t;x.classList.toggle('on',on);x.querySelector('i').textContent=on?'ON':'OFF'})}
+  document.querySelectorAll('.umbonly').forEach(e=>e.remove());
+  $('optTop').querySelectorAll('button').forEach(x=>{const on=t;x.classList.toggle('on',on);x.querySelector('i').textContent=on?'ON':'OFF'})}
 function applyShade(){if(!m1Ready)return;const u=shadeOpt==='umb'||shadeOpt==='both',t=shadeOpt==='tree'||shadeOpt==='both';
-  ['umb','umb-dot'].forEach(l=>map1.setLayoutProperty(l,'visibility',u?'visible':'none'));map1.setLayoutProperty('umbheat','visibility',u&&$('t1').querySelector('[data-k=umbheat]').checked?'visible':'none');
-  ['tree','stree','streeheat'].forEach(l=>map1.setLayoutProperty(l,'visibility',t?'visible':'none'));
-  toast(shadeOpt==='none'?'Shade layers hidden':`${u?'☂ '+fmt(P.tot_umb)+' umbrellas':''}${u&&t?' + ':''}${t?'🌳 '+fmt(P.tot_tree)+' trees':''}${map1.getZoom()<13.5?' · zoom in for exact spots':''}`)}
+  ['umb','umb-dot'].forEach(l=>map1.setLayoutProperty(l,'visibility',u?'visible':'none'));
+  ['tree','stree'].forEach(l=>map1.setLayoutProperty(l,'visibility',t?'visible':'none'));
+  toast(shadeOpt==='none'?'Trees hidden':`${t?'🌳 '+fmt(P.tot_tree)+' trees':''}${map1.getZoom()<13.5?' · zoom in for exact spots':''}`)}
 function toggle1(k,on){if(!m1Ready)return;const v=on?'visible':'none';
   if(k==='pulse'){pulse1=on;return}
-  if(k==='hex1'){map1.setLayoutProperty('hex1','visibility',on&&!is3D1?'visible':'none');map1.setLayoutProperty('hex1-3d','visibility',on&&is3D1?'visible':'none');map1.setLayoutProperty('hex1-crit',' visibility'.trim(),v);return}
-  ({perim:['perim-fill','perim-line'],fp:['fp'],walk1:['walk1','walk1-glow'],parks1:['parks1'],cross1:['cross1'],suit:['suit'],umbheat:['umbheat']}[k]||[]).forEach(l=>map1.setLayoutProperty(l,'visibility',v))}
+  if(k==='hex1'){map1.setLayoutProperty('hex1','visibility',on&&!is3D1?'visible':'none');map1.setLayoutProperty('hex1-3d','visibility',on&&is3D1?'visible':'none');return}
+  ({perim:['perim-fill','perim-line'],fp:['fp'],walk1:['walk1'],parks1:['parks1'],cross1:['cross1'],suit:['suit'],umbheat:['umbheat']}[k]||[]).forEach(l=>map1.setLayoutProperty(l,'visibility',v))}
 map1.on('load',()=>{
-  ['hex','perim','fp','parks','walk','sites','umb','trees_p'].forEach(k=>map1.addSource(k,{type:'geojson',data:D[k]}));
+  ['hex','zcpi','ztree','perim','fp','parks','walk','sites','umb','trees_p'].forEach(k=>map1.addSource(k,{type:'geojson',data:D[k]}));
   map1.addSource('pcnet',{type:'geojson',data:D.pcnet});
   const cc=['match',['get','c'],1,CPI_COL[1],2,CPI_COL[2],3,CPI_COL[3],4,CPI_COL[4],5,CPI_COL[5],'#000'];
-  map1.addLayer({id:'hex1',type:'fill',source:'hex',filter:['>=',['get','c'],1],paint:{'fill-color':cc,'fill-opacity':['interpolate',['linear'],['zoom'],12,['match',['get','c'],1,0.28,2,0.45,3,0.55,4,0.62,5,0.7,0],16,['match',['get','c'],1,0.12,2,0.2,3,0.28,4,0.32,5,0.36,0]],'fill-outline-color':'rgba(0,0,0,0.15)'}},'lbl');
+  map1.addLayer({id:'hex1',type:'fill',source:'zcpi',filter:['>=',['get','c'],1],paint:{'fill-color':cc,'fill-opacity':['interpolate',['linear'],['zoom'],10,['match',['get','c'],1,0.45,2,0.62,3,0.75,4,0.84,5,0.9,0],13,['match',['get','c'],1,0.3,2,0.45,3,0.55,4,0.62,5,0.7,0],16,['match',['get','c'],1,0.12,2,0.2,3,0.28,4,0.32,5,0.36,0]],'fill-outline-color':'rgba(0,0,0,0)'}},'lbl');
   map1.addLayer({id:'hex1-3d',type:'fill-extrusion',source:'hex',filter:['>=',['get','c'],2],layout:{visibility:'none'},paint:{'fill-extrusion-color':cc,'fill-extrusion-height':['*',['^',['get','v'],2],2200],'fill-extrusion-opacity':0.85}},'lbl');
-  map1.addLayer({id:'hex1-crit',type:'line',source:'hex',filter:['==',['get','c'],5],paint:{'line-color':'#ff6b8b','line-width':1.4}},'lbl');
+  map1.addLayer({id:'treeden',type:'fill',source:'ztree',layout:{visibility:'none'},paint:{'fill-color':['match',['get','c'],1,'#ecfccb',2,'#bef264',3,'#4ade80',4,'#16a34a',5,'#14532d','#000'],'fill-opacity':['interpolate',['linear'],['zoom'],10,0.8,13,0.65,16,0.3]}},'lbl');
+  map1.addLayer({id:'hex1-crit',type:'line',source:'zcpi',layout:{visibility:'none'},filter:['==',['get','c'],99],paint:{'line-color':'#ff6b8b'}},'lbl');
   map1.addLayer({id:'parks1',type:'fill',source:'parks',paint:{'fill-color':'#4ade80','fill-opacity':0.35,'fill-outline-color':'#4ade80'}});
-  map1.addLayer({id:'walk1-glow',type:'line',source:'walk',paint:{'line-color':'#2dd4bf','line-width':['interpolate',['linear'],['zoom'],11,2,17,12],'line-opacity':0.18,'line-blur':3}});
+  map1.addLayer({id:'walk1-glow',type:'line',source:'walk',layout:{visibility:'none'},paint:{'line-color':'#2dd4bf','line-width':['interpolate',['linear'],['zoom'],11,2,17,12],'line-opacity':0.18,'line-blur':3}});
   map1.addLayer({id:'walk1',type:'line',source:'walk',paint:{'line-color':'#5eead4','line-width':['interpolate',['linear'],['zoom'],11,0.7,17,3]}});
   map1.addLayer({id:'cross1',type:'line',source:'pcnet',minzoom:13.5,filter:['==',['get','w'],1],paint:{'line-color':'#fde047','line-width':['interpolate',['linear'],['zoom'],14,1,18,4],'line-dasharray':[1,1]}});
   map1.addLayer({id:'perim-fill',type:'fill',source:'perim',paint:{'fill-color':UMB,'fill-opacity':['interpolate',['linear'],['zoom'],11,0.55,16,0.3]}});
   map1.addLayer({id:'perim-line',type:'line',source:'perim',minzoom:13,paint:{'line-color':'#a5f3fc','line-width':1}});
-  map1.addLayer({id:'fp',type:'fill',source:'fp',paint:{'fill-color':'#0b1016','fill-opacity':0.7,'fill-outline-color':'#a5f3fc'}});
+  map1.addLayer({id:'fp',type:'line',source:'fp',minzoom:13,paint:{'line-color':'#a5f3fc','line-width':0.8,'line-opacity':0.8}});
   map1.addSource('suit',{type:'geojson',data:SUIT});
-  map1.addLayer({id:'suit',type:'circle',source:'suit',minzoom:14.5,paint:{'circle-radius':mRad(3.6),'circle-color':SUIT_COL,'circle-opacity':['interpolate',['linear'],['zoom'],14.5,0,15.5,0.55]}});
-  map1.addLayer({id:'umbheat',type:'heatmap',source:'umb',maxzoom:14.5,paint:{'heatmap-radius':['interpolate',['linear'],['zoom'],9,4,14,18],'heatmap-intensity':['interpolate',['linear'],['zoom'],9,0.5,14,1.2],
+  map1.addLayer({id:'suit',type:'circle',source:'suit',minzoom:14.5,layout:{visibility:'none'},paint:{'circle-radius':mRad(3.6),'circle-color':SUIT_COL,'circle-opacity':['interpolate',['linear'],['zoom'],14.5,0,15.5,0.55]}});
+  map1.addLayer({id:'umbheat',type:'heatmap',source:'umb',maxzoom:14.5,layout:{visibility:'none'},paint:{'heatmap-radius':['interpolate',['linear'],['zoom'],9,4,14,18],'heatmap-intensity':['interpolate',['linear'],['zoom'],9,0.5,14,1.2],
     'heatmap-color':['interpolate',['linear'],['heatmap-density'],0,'rgba(0,0,0,0)',0.15,'rgba(14,116,144,.45)',0.4,'#22d3ee',0.7,'#a5f3fc',1,'#ffffff'],'heatmap-opacity':['interpolate',['linear'],['zoom'],12,0.85,14.5,0]}});
   map1.addSource('stree',{type:'geojson',data:STREE});
   map1.addLayer({id:'streeheat',type:'heatmap',source:'stree',maxzoom:14.5,layout:{visibility:'none'},paint:{'heatmap-radius':['interpolate',['linear'],['zoom'],9,2,14,8],'heatmap-intensity':['interpolate',['linear'],['zoom'],9,0.02,12,0.05,14,0.2],
     'heatmap-color':['interpolate',['linear'],['heatmap-density'],0,'rgba(0,0,0,0)',0.25,'rgba(21,128,61,.35)',0.6,'rgba(34,197,94,.6)',1,'rgba(134,239,172,.75)'],'heatmap-opacity':['interpolate',['linear'],['zoom'],12,0.8,14.5,0]}});
-  map1.addLayer({id:'stree',type:'circle',source:'stree',minzoom:13,layout:{visibility:'none'},paint:{'circle-radius':['interpolate',['exponential',2],['zoom'],13,1.2,15,2.6,17,7.36,22,235.6],'circle-color':TREE,'circle-opacity':0.45,'circle-stroke-color':'#bbf7d0','circle-stroke-width':['interpolate',['linear'],['zoom'],15,0,17,0.8]}});
-  map1.addLayer({id:'tree',type:'circle',source:'trees_p',minzoom:12,layout:{visibility:'none'},paint:{'circle-radius':['interpolate',['exponential',2],['zoom'],12,2.2,15,3.6,17,7.36,22,235.6],'circle-color':TREE,'circle-opacity':0.55,'circle-stroke-color':'#bbf7d0','circle-stroke-width':1}});
-  map1.addLayer({id:'umb',type:'circle',source:'umb',minzoom:12,paint:{'circle-radius':['interpolate',['exponential',2],['zoom'],12,1.8,15,2.8,17,5.19,22,166.1],'circle-color':['match',['get','e'],'j','#fbbf24','c','#fde047','w','#5eead4',UMB],'circle-opacity':0.35,'circle-stroke-color':'#e0f7ff','circle-stroke-width':['interpolate',['linear'],['zoom'],13,0.4,18,1.6]}});
-  map1.addLayer({id:'umb-dot',type:'circle',source:'umb',minzoom:15,paint:{'circle-radius':['interpolate',['linear'],['zoom'],12,0.8,18,2.5],'circle-color':'#ffffff'}});
+  map1.addLayer({id:'stree',type:'circle',source:'stree',minzoom:13,layout:{visibility:'none'},paint:{'circle-radius':['interpolate',['exponential',2],['zoom'],13,1.2,15,1.4,17,3.77,22,120.8],'circle-color':TREE,'circle-opacity':0.45,'circle-stroke-color':'#bbf7d0','circle-stroke-width':['interpolate',['linear'],['zoom'],15,0,17,0.8]}});
+  map1.addLayer({id:'tree',type:'circle',source:'trees_p',minzoom:12,layout:{visibility:'none'},paint:{'circle-radius':['interpolate',['exponential',2],['zoom'],12,2.2,15,2.4,17,3.77,22,120.8],'circle-color':TREE,'circle-opacity':0.55,'circle-stroke-color':'#bbf7d0','circle-stroke-width':1}});
+  map1.addLayer({id:'umb',type:'circle',source:'umb',minzoom:12,layout:{visibility:'none'},paint:{'circle-radius':['interpolate',['exponential',2],['zoom'],12,1.8,15,2.8,17,5.19,22,166.1],'circle-color':['match',['get','e'],'j','#fbbf24','c','#fde047','w','#5eead4',UMB],'circle-opacity':0.35,'circle-stroke-color':'#e0f7ff','circle-stroke-width':['interpolate',['linear'],['zoom'],13,0.4,18,1.6]}});
+  map1.addLayer({id:'umb-dot',type:'circle',source:'umb',minzoom:15,layout:{visibility:'none'},paint:{'circle-radius':['interpolate',['linear'],['zoom'],12,0.8,18,2.5],'circle-color':'#ffffff'}});
   const catCol=['match',['get','cat'],...Object.entries(CAT).flatMap(([k,v])=>[k,v.c]),'#fff'];
-  map1.addLayer({id:'sites1-glow',type:'circle',source:'sites',paint:{'circle-color':catCol,'circle-radius':['interpolate',['linear'],['zoom'],10,4,16,16],'circle-opacity':0.25,'circle-blur':1}});
-  map1.addLayer({id:'sites1-ring',type:'circle',source:'sites',filter:['>=',['get','c'],5],paint:{'circle-color':'rgba(0,0,0,0)','circle-radius':8,'circle-stroke-color':'#ff6b8b','circle-stroke-width':2}});
+  map1.addLayer({id:'sites1-glow',type:'circle',source:'sites',layout:{visibility:'none'},paint:{'circle-color':catCol,'circle-radius':['interpolate',['linear'],['zoom'],10,4,16,16],'circle-opacity':0.25,'circle-blur':1}});
+  map1.addLayer({id:'sites1-ring',type:'circle',source:'sites',layout:{visibility:'none'},filter:['>=',['get','c'],5],paint:{'circle-color':'rgba(0,0,0,0)','circle-radius':8,'circle-stroke-color':'#ff6b8b','circle-stroke-width':2}});
   map1.addLayer({id:'sites1',type:'circle',source:'sites',paint:{'circle-color':catCol,'circle-radius':['interpolate',['linear'],['zoom'],10,['+',1.6,['*',0.4,['get','c']]],16,['+',4,['*',1.3,['get','c']]]],'circle-stroke-color':'#0b1016','circle-stroke-width':1}});
   addBoundary(map1);haramMarker(map1,'Masjid an‑Nabawi');
-  m1Ready=true;
+  m1Ready=true;syncShadeUI();applyShade();
   map1.on('click','sites1',e=>{const f=e.features[0];sitePopup(f.properties,f.geometry.coordinates)});
   map1.on('click',e=>{if(map1.queryRenderedFeatures(e.point,{layers:['sites1']}).length)return;
     const bb=[[e.point.x-6,e.point.y-6],[e.point.x+6,e.point.y+6]];
@@ -466,10 +479,8 @@ map1.on('load',()=>{
         <div class="s">${EL[p.e]||p.e}${p.n?' · <span dir="auto">'+esc(p.n)+'</span>':''} · zone ${CPI_LBL[p.c]||'–'}</div>
         ${bar('Heat (CPI)',p.h/100,'#e4473c')}${bar('Footfall',p.f/100,'#ffd166')}${bar('Sun exposure',p.x/100,'#f59342')}${bar('Sidewalk access',p.a/100,'#22d3ee')}
         ${timesHTML(walkTimes(e.lngLat))}</div>`).addTo(map1);return}
-    const sc=map1.getZoom()>=14.5?map1.queryRenderedFeatures(bb,{layers:['suit']})[0]:null;
-    const h=map1.queryRenderedFeatures(e.point,{layers:['hex1','hex1-3d']})[0];const p=h?h.properties:null;
-    new maplibregl.Popup({maxWidth:'300px'}).setLngLat(e.lngLat).setHTML(`<div class="pp">${p?`<h5>Cooling priority: <span style="color:${CPI_COL[p.c]}">${CPI_LBL[p.c]}</span></h5><div class="s">CPI ${(+p.v).toFixed(2)}${sc?` · umbrella suitability <b style="color:#fff">${sc.properties.s}</b>/100`:''}</div>
-      ${bar('Sensitive uses',p.s,'#2dd4bf')}${bar('Pedestrian PMI',p.p,'#ffd166')}${bar('Shade deficit',p.sh,'#f59342')}`:'<h5>Outside priority zones</h5>'}
+    const p=hexAt(e.lngLat.lng,e.lngLat.lat);
+    new maplibregl.Popup({maxWidth:'330px'}).setLngLat(e.lngLat).setHTML(`<div class="pp">${p&&p.c>=1?priorityCard(p):'<h5>Outside the cooling priority area</h5><div class="s">No sensitive uses or pedestrian movement here.</div>'}
       ${timesHTML(walkTimes(e.lngLat))}</div>`).addTo(map1)});
   ['umb','suit'].forEach(l=>{map1.on('mouseenter',l,()=>map1.getCanvas().style.cursor='pointer');map1.on('mouseleave',l,()=>map1.getCanvas().style.cursor='')});
   applyUmbFilter();
@@ -480,21 +491,24 @@ $('lg1').innerHTML=`<h4>Cooling Priority Index</h4>${[5,4,3,2,1].map(k=>`<div cl
   <div class="sep"></div><div class="lg"><span class="sw" style="background:${UMB}"></span>Cooling perimeter around building</div>
   <div class="lg"><span class="sw l" style="background:#5eead4"></span>Walkway / pedestrian zone</div><div class="lg"><span class="sw l" style="background:#fde047"></span>Road crossing (waiting in sun)</div>
   <div class="lg"><span class="sw" style="background:#4ade80;opacity:.6"></span>Park / green area</div>
-  <div class="sep"></div><div class="lg"><span class="sw c" style="background:${UMB};border:1px solid #e0f7ff"></span>☂ at building / park</div><div class="lg"><span class="sw c" style="background:#fbbf24"></span>☂ at road junction</div>
-  <div class="lg"><span class="sw c" style="background:#fde047"></span>☂ at ped. crossing</div><div class="lg"><span class="sw c" style="background:#5eead4"></span>☂ walkway shade stop</div>
-  <div class="lg"><span class="sw c" style="background:${TREE}99;border:1px solid #bbf7d0"></span>🌳 shade tree (200 m²)</div>
-  <div style="font-size:11.5px;color:#d5dde8;margin-top:6px">Umbrella suitability (z15+)</div><div class="ramp" style="background:linear-gradient(90deg,#334155,#f59e0b 45%,#22d3ee 75%,#a5f3fc)"></div><div class="rampl"><span>35</span><span>55</span><span>100</span></div>
+  <div class="sep"></div><div class="lg"><span class="sw c" style="background:${TREE}99;border:1px solid #bbf7d0"></span>🌳 shade tree (53 m² crown)</div>
   <div class="sep"></div>${Object.values(CAT).map(v=>`<div class="lg"><span class="sw c" style="background:${v.c}"></span>${v.l}</div>`).join('')}
-  <div class="lg"><span class="sw c" style="border:2px solid #ff6b8b"></span>Critical‑tier site (top 10 %)</div>`;
+  <div id="lgtd" style="display:none"><div class="sep"></div><div style="font-size:11.5px;color:#d5dde8">🌳 Proposed trees per hectare</div><div class="ramp" style="background:linear-gradient(90deg,#ecfccb 0 20%,#bef264 20% 40%,#4ade80 40% 60%,#16a34a 60% 80%,#14532d 80%)"></div><div class="rampl"><span>&lt;2</span><span>2–5</span><span>5–10</span><span>10–20</span><span>20+</span></div></div>`;
+// hexagon colour mode
+let hexMode='cpi';
+$('hexmode').querySelectorAll('button').forEach(b=>b.onclick=()=>{hexMode=b.dataset.h;$('hexmode').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+  if(!m1Ready)return;const t=hexMode==='tree';map1.setLayoutProperty('treeden','visibility',t?'visible':'none');
+  ['hex1'].forEach(l=>map1.setLayoutProperty(l,'visibility',t?'none':($('t1').querySelector('[data-k=hex1]').checked?'visible':'none')));
+  $('lgtd').style.display=t?'':'none';toast(t?'1 km cells coloured by proposed trees per hectare':'1 km cells coloured by Cooling Priority Index')});
 $('bcsv').onclick=()=>{
-  const rows=[['Rank','Category','Name','Tier','Score','Zone m2','Shade demand m2','Umbrellas 100m2','Trees 200m2','Note']];
-  P.top.forEach((r,i)=>rows.push([i+1,r.cat,r.name,r.tl,r.score,r.zone_m2,r.demand_m2,r.umbrellas,r.trees,r.note]));
+  const rows=[['Rank','Category','Name','Tier','Score','Zone m2','Trees (53 m2 crown)']];
+  P.top.forEach((r,i)=>rows.push([i+1,r.cat,r.name,r.tl,r.score,r.zone_m2,r.trees]));
   rows.push([]);Object.entries(P.summary).forEach(([k,r])=>rows.push(['',k,'','','','',r.m2,r.umb,r.tree,'']));
   const csv='﻿'+rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='Madinah_Action_Requirement_Plan_top40.csv';a.click()};
 
 // ===================== MAP 2 =====================
-let map2=null,m2Ready=false,origin='h',T=15,playing=false,show={ctrips:true,umb2:true,cmin:true,trips:true,corr:true,catch:true,hex2:true,hot:true,pcnet:false,pc:false,pcp:false};
+let map2=null,m2Ready=false,origin='h',T=15,playing=false,show={ctrips:true,umb2:false,stree2:true,cmin:true,trips:true,corr:true,catch:true,hex2:true,hot:true,pcnet:false,pc:false,pcp:false};
 function initMap2(){if(map2)return;map2=mkMap('map2');
   map2.on('load',()=>{
     ['hex','hot','corr','catch','sites','pcnet'].forEach(k=>map2.addSource(k,{type:'geojson',data:D[k]}));
@@ -526,7 +540,7 @@ function initMap2(){if(map2)return;map2=mkMap('map2');
     map2.addLayer({id:'cmin1',type:'symbol',source:'cmin',minzoom:14,filter:['==',['get','m'],-1],layout:{...mtxt,'text-size':10.5},paint:mpaint});
     map2.addSource('rplan',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
     map2.addSource('umb2',{type:'geojson',data:D.umb});map2.addSource('stree2',{type:'geojson',data:STREE});
-    map2.addLayer({id:'stree2',type:'circle',source:'stree2',minzoom:14.5,paint:{'circle-radius':['interpolate',['exponential',2],['zoom'],14.5,1.6,17,7.36,22,235.6],'circle-color':'#22c55e','circle-opacity':0.35}});
+    map2.addLayer({id:'stree2',type:'circle',source:'stree2',minzoom:14.5,paint:{'circle-radius':['interpolate',['exponential',2],['zoom'],14.5,1.6,17,3.77,22,120.8],'circle-color':'#22c55e','circle-opacity':0.35}});
     map2.addLayer({id:'umb2',type:'circle',source:'umb2',minzoom:14,paint:{'circle-radius':['interpolate',['exponential',2],['zoom'],14,1.8,17,5.19,22,166.1],'circle-color':UMB,'circle-opacity':0.6,'circle-stroke-color':'#e0f7ff','circle-stroke-width':0.8}});
     addPedIcons(map2);
     map2.addLayer({id:'heads-fig',type:'symbol',source:'heads',minzoom:14.5,layout:{'icon-image':['match',['get','g'],0,'ped0','ped1'],'icon-size':['interpolate',['linear'],['zoom'],14.5,0.45,18,0.9],'icon-allow-overlap':true,'icon-anchor':'bottom'}});
@@ -544,7 +558,7 @@ function initMap2(){if(map2)return;map2=mkMap('map2');
       if(coolMode){coolClick(e.lngLat);return}
       const p=hexAt(e.lngLat.lng,e.lngLat.lat);
       new maplibregl.Popup({maxWidth:'300px'}).setLngLat(e.lngLat).setHTML(`<div class="pp">${p?`<h5>Pedestrian movement: <span style="color:${PMI_COL[p.pc]}">${PMI_LBL[p.pc]}</span></h5><div class="s">PMI ${(+p.p).toFixed(2)} · cooling tier ${CPI_LBL[p.c]||'–'}</div>${bar('Walkability',p.w,'#7dd3fc')}${bar('Destinations',p.d,'#ffd166')}${bar('Built intensity',p.b,'#a3307e')}`:'<h5>This spot</h5>'}
-        ${timesHTML(walkTimes(e.lngLat))}<div style="margin-top:8px;display:flex;gap:6px"><button class="btn" onclick="exploreCool(${e.lngLat.lng},${e.lngLat.lat})">🚶 Walk to nearest shade ☂</button></div></div>`).addTo(map2)});
+        ${timesHTML(walkTimes(e.lngLat))}<div style="margin-top:8px;display:flex;gap:6px"><button class="btn" onclick="exploreCool(${e.lngLat.lng},${e.lngLat.lat})">🚶 Walk to nearest shade 🌳</button></div></div>`).addTo(map2)});
     map2.flyTo({center:D.haram,zoom:13.2,pitch:55,bearing:-25,duration:3500});
   })}
 (function(){
@@ -557,14 +571,14 @@ function initMap2(){if(map2)return;map2=mkMap('map2');
   $('orig').innerHTML=Object.entries(ORIG).map(([k,v])=>`<button data-k="${k}" class="${k===origin?'on':''}">${v.l}</button>`).join('');
   $('orig').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('orig').querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');setOrigin(b.dataset.k);startPlay()});
   distRows($('d2'),[5,4,3,2,1].map(k=>({l:PMI_LBL[k],c:PMI_COL[k],v:S.pmi_counts[k],t:fmt(S.pmi_counts[k]*S.hex_km2,1)+' km²'})),Math.max(...Object.values(S.pmi_counts)));
-  const T2=[['umb2','Proposed umbrellas + street trees (zoom in)'],['cmin','Walking‑minute labels on map'],['hex2','PMI hexagons (3D)'],['hot','Movement hotspots'],['corr','Animated corridors'],['ctrips',`People walking across the city (${fmt(TRC.length)})`],['trips','Pedestrians walking to the Haram'],['catch','Walking catchment network'],
+  const T2=[['stree2','Proposed street trees (zoom in)'],['cmin','Walking‑minute labels on map'],['hex2','PMI 1 km cells (3D)'],['hot','Movement hotspots'],['corr','Animated corridors'],['ctrips',`People walking across the city (${fmt(TRC.length)})`],['trips','Pedestrians walking to the Haram'],['catch','Walking catchment network'],
             ['pcnet','PedestrianCatch sidewalks + crossings'],['pc','PedestrianCatch 1–10 min hulls'],['pcp','PedestrianCatch timed points']];
   $('t2').innerHTML=T2.map(([k,l])=>`<label class="tg"><input type="checkbox" data-k="${k}" ${show[k]?'checked':''}>${l}</label>`).join('');
   $('t2').querySelectorAll('input').forEach(i=>i.onchange=()=>{show[i.dataset.k]=i.checked;applyShow2()});
   const pc=D.pc;
   $('pcbox').innerHTML=pc.found?`<div class="kpis" style="margin:0 0 6px"><div class="kpi" style="--k:#818cf8"><div class="v">${pc.median_abs_min}<small>min</small></div><div class="l">median difference · ${fmt(pc.compared)} points</div></div>
     <div class="kpi" style="--k:#4ade80"><div class="v">${pc.within2}<small>%</small></div><div class="l">agree within ±2 min</div></div></div>
-    <ul class="pts" style="margin:0"><li>Same ${pc.starts} start points re‑run on our network</li><li>Two independent tools agree → model validated</li>${pc.net_n?`<li>${fmt(pc.cross_n)} PedestrianCatch crossings → crossing ☂ on Map 01</li>`:''}</ul>`:'No PedestrianCatch export found.';
+    <ul class="pts" style="margin:0"><li>Same ${pc.starts} start points re‑run on our network</li><li>Two independent tools agree → model validated</li></ul>`:'No PedestrianCatch export found.';
   $('m2').innerHTML=`<div class="formula">PMI = 35% Walkability + 45% Destinations + 20% Built</div>
     <ul class="pts" style="margin:0"><li><b>Walk time</b>: Dijkstra on ${fmt(S.walk_km)} km footpaths + streets · ${SPEED_MS} m/s</li>
     <li><b>Pedestrians</b>: ${fmt(D.trips.length)} walk to the Haram (gold) + ${fmt(TRC.length)} across the city (cyan), each on the real shortest path to the nearest mosque / school / bus / mall / park. More people start on busier streets (PMI).</li><li><b>Corridor width</b> = flow</li></ul>
@@ -582,13 +596,13 @@ let playT0=0;function startPlay(){playing=true;playT0=performance.now();$('bplay
 $('bplay').onclick=()=>{if(playing){playing=false;$('bplay').textContent='▶ Play'}else startPlay()};
 function applyShow2(){if(!m2Ready)return;const vis=(l,on)=>map2.setLayoutProperty(l,'visibility',on?'visible':'none');
   vis('hex2',show.hex2&&!is3D2);vis('hex2-3d',show.hex2&&is3D2);vis('hot',show.hot);vis('corr-base',show.corr);vis('corr-flow',show.corr);
-  vis('trips',show.trips);vis('ctrips',show.ctrips);vis('heads',show.trips||show.ctrips);vis('heads-fig',show.trips||show.ctrips);vis('catch',show.catch);vis('pch',show.pc);vis('pcp',show.pcp);vis('pcp-t',show.pcp);vis('pcnet',show.pcnet);vis('cmin5',show.cmin);vis('cmin1',show.cmin);vis('umb2',show.umb2);vis('stree2',show.umb2)}
+  vis('trips',show.trips);vis('ctrips',show.ctrips);vis('heads',show.trips||show.ctrips);vis('heads-fig',show.trips||show.ctrips);vis('catch',show.catch);vis('pch',show.pc);vis('pcp',show.pcp);vis('pcp-t',show.pcp);vis('pcnet',show.pcnet);vis('cmin5',show.cmin);vis('cmin1',show.cmin);vis('umb2',show.umb2);vis('stree2',show.stree2)}
 $('lg2').innerHTML=`<h4>Pedestrian Movement Index</h4>${[5,4,3,2].map(k=>`<div class="lg"><span class="sw" style="background:${PMI_COL[k]}"></span>${PMI_LBL[k]}</div>`).join('')}
   <div class="lg"><span class="sw" style="border:1.5px dashed #ffd166"></span>Movement hotspot</div><div class="sep"></div>
   <div class="lg"><span class="sw l" style="background:#fff"></span>Busy street corridor (width = flow)</div><div class="lg"><span class="sw l" style="background:#7dd3fc"></span>Footpath / pedestrian corridor</div>
   <div class="lg"><span class="sw c" style="background:#fff7d6;box-shadow:0 0 6px #ffd166"></span>Pedestrian walking to the Haram</div><div class="lg"><span class="sw c" style="background:#cffafe;box-shadow:0 0 6px #67e8f9"></span>Pedestrian walking in the city</div>
   <div class="sep"></div><div style="font-size:11.5px;color:#d5dde8">Walk time from origin</div><div class="ramp" style="background:linear-gradient(90deg,#22d3ee,#a3e635 33%,#ffd166 66%,#f43f5e)"></div><div class="rampl"><span>0</span><span>5</span><span>10</span><span>15 min</span></div>
-  <div class="sep"></div><div class="lg"><span class="sw l" style="background:#cbd5e1"></span>A→B fastest route</div><div class="lg"><span class="sw l" style="background:#22c55e"></span>A→B cool route</div><div class="lg"><span class="sw l" style="background:#f43f5e"></span>Cool route through hot zone</div><div class="lg"><span class="sw c" style="background:#0e7490;border:1px solid #fff"></span>☂ Shade stop on route</div><div class="lg"><span class="sw c" style="background:${UMB}"></span>Proposed umbrella</div><div class="lg"><span class="sw c" style="background:#22c55e"></span>Proposed street tree</div>
+  <div class="sep"></div><div class="lg"><span class="sw l" style="background:#cbd5e1"></span>A→B fastest route</div><div class="lg"><span class="sw l" style="background:#22c55e"></span>A→B cool route</div><div class="lg"><span class="sw l" style="background:#f43f5e"></span>Cool route through hot zone</div><div class="lg"><span class="sw c" style="background:#15803d;border:1px solid #fff"></span>🌳 Shade stop on route</div><div class="lg"><span class="sw c" style="background:#22c55e"></span>Proposed street tree</div>
   <div class="lg"><span class="sw c" style="background:${CAT.Bus.c}"></span>Bus station / stop</div><div class="lg"><span class="sw c" style="background:${CAT.Mall.c}"></span>Shopping mall</div>`;
 
 function addPedIcons(m){[0,1].forEach(g=>{const W=40,H=60,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
@@ -627,18 +641,17 @@ function shortest(s,t,cool){const g=buildGraph(),hf=cool?heatFactor():null,dist=
   let len=0;for(let i=1;i<path.length;i++)len+=Math.hypot((g.lon[path[i]]-g.lon[path[i-1]])*101200,(g.lat[path[i]]-g.lat[path[i-1]])*110900);return{path,len}}
 // ---- proposed shade (umbrellas + trees) used by the walk model ----
 let SH=null;
-function shadeIndex(){if(SH)return SH;const pts=[];D.umb.features.forEach(f=>pts.push({c:f.geometry.coordinates,k:'umb'}));D.trees_p.features.forEach(f=>pts.push({c:f.geometry.coordinates,k:'tree'}));
+function shadeIndex(){if(SH)return SH;const pts=[];D.trees_p.features.forEach(f=>pts.push({c:f.geometry.coordinates,k:'tree'}));
   STREE.features.forEach(f=>pts.push({c:f.geometry.coordinates,k:'tree'}));
   const C=0.0005,grid=new Map();pts.forEach((p,i)=>{const key=Math.floor(p.c[0]/C)+','+Math.floor(p.c[1]/C);(grid.get(key)||grid.set(key,[]).get(key)).push(i)});return SH={pts,grid,C}}
 function shadeNear(lon,lat,r,onlyUmb){const s=shadeIndex(),cx=Math.floor(lon/s.C),cy=Math.floor(lat/s.C);let best=-1,bd=r;
   for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++)(s.grid.get((cx+a)+','+(cy+b))||[]).forEach(i=>{if(onlyUmb&&s.pts[i].k!=='umb')return;const p=s.pts[i].c,d=Math.hypot((p[0]-lon)*101200,(p[1]-lat)*110900);if(d<bd){bd=d;best=i}});return best<0?null:{i:best,d:bd,p:s.pts[best]}}
-// shade stops along a path (proposed umbrella / tree within 20 m) + longest stretch in the sun
+// shade stops along a path (proposed tree within 20 m, one every >= 60 m) + longest stretch in the sun
 function shadeStops(co){const st=[];let acc=0,lastD=-1e9;const used=new Set(),shaded=[];
   for(let i=1;i<co.length;i++){const L=Math.hypot((co[i][0]-co[i-1][0])*101200,(co[i][1]-co[i-1][1])*110900),n=Math.max(1,Math.ceil(L/10));
     for(let k=1;k<=n;k++){const f=k/n,x=co[i-1][0]+(co[i][0]-co[i-1][0])*f,y=co[i-1][1]+(co[i][1]-co[i-1][1])*f,d=acc+L*f,h=shadeNear(x,y,20);
       if(h)shaded.push(d);
-      const u=shadeNear(x,y,20,true);
-      if(u&&!used.has(u.i)&&d-lastD>=60&&d>15){used.add(u.i);lastD=d;st.push({c:u.p.c,k:'umb',t:d/SPEED_MS/60,d})}}
+      if(h&&!used.has(h.i)&&d-lastD>=60&&d>15){used.add(h.i);lastD=d;st.push({c:h.p.c,k:'tree',t:d/SPEED_MS/60,d})}}
     acc+=L}
   const ds=[0,...shaded,acc];let gap=0;for(let i=1;i<ds.length;i++)gap=Math.max(gap,ds[i]-ds[i-1]);
   return{stops:st,sun:gap/SPEED_MS/60}}
@@ -666,7 +679,7 @@ function animateWalker(co,stops,label){
     const wf=zoomFactors()[1];fig.style.setProperty('--sw',(0.62/Math.max(0.5,Math.min(1.3,wf))).toFixed(2)+'s');
     if(rest>0){rest-=dt;if(rest<=0)fig.classList.remove('rest');walkRAF=requestAnimationFrame(step);return}
     walked=Math.min(total,walked+dt*30*SPEED_MS*wf);
-    if(si<stopD.length&&walked>=stopD[si]){walked=stopD[si];rest=0.9;fig.classList.add('rest');tag.textContent='☂ shade stop · '+fmt(walked/SPEED_MS/60,1)+' min';si++}
+    if(si<stopD.length&&walked>=stopD[si]){walked=stopD[si];rest=0.9;fig.classList.add('rest');tag.textContent='🌳 shade stop · '+fmt(walked/SPEED_MS/60,1)+' min';si++}
     else tag.textContent=fmt(walked/SPEED_MS/60,1)+' min · '+fmt(walked)+' m';
     let i=1;while(i<cum.length-1&&cum[i]<walked)i++;const f=(walked-cum[i-1])/Math.max(1e-6,cum[i]-cum[i-1]);
     walker.setLngLat([co[i-1][0]+(co[i][0]-co[i-1][0])*f,co[i-1][1]+(co[i][1]-co[i-1][1])*f]);
@@ -674,11 +687,11 @@ function animateWalker(co,stops,label){
     if(walked<total)walkRAF=requestAnimationFrame(step);
     else{fig.classList.add('rest');tag.textContent=(label||'Arrived')+' · '+fmt(total/SPEED_MS/60,1)+' min'}}
   walkRAF=requestAnimationFrame(step)}
-// ---- nearest cool spot = nearest proposed umbrella / park (heat-aware network) ----
+// ---- nearest cool spot = nearest tree-shaded site forecourt / park (heat-aware network) ----
 let COOLT=null;
 function coolTargets(){if(COOLT)return COOLT;const g=buildGraph();COOLT=new Map();
-  D.umb.features.forEach(f=>{const c=f.geometry.coordinates,n=snapNode({lng:c[0],lat:c[1]});if(n<0)return;const d=Math.hypot((g.lon[n]-c[0])*101200,(g.lat[n]-c[1])*110900);
-    if(d<30&&!COOLT.has(n))COOLT.set(n,{k:'umb',c,name:f.properties.n})});
+  D.trees_p.features.forEach(f=>{const c=f.geometry.coordinates,n=snapNode({lng:c[0],lat:c[1]});if(n<0)return;const d=Math.hypot((g.lon[n]-c[0])*101200,(g.lat[n]-c[1])*110900);
+    if(d<30&&!COOLT.has(n))COOLT.set(n,{k:'tree',c,name:f.properties.n})});
   D.sites.features.forEach(f=>{if(f.properties.cat!=='Park')return;const n=snapNode({lng:f.geometry.coordinates[0],lat:f.geometry.coordinates[1]});
     const d=Math.hypot((g.lon[n]-f.geometry.coordinates[0])*101200,(g.lat[n]-f.geometry.coordinates[1])*110900);if(d<120&&!COOLT.has(n))COOLT.set(n,{k:'park',c:f.geometry.coordinates,name:f.properties.name})});return COOLT}
 const SK={umb:{i:'☂',l:'proposed umbrella (100 m²)',c:'#0e7490'},tree:{i:'🌳',l:'proposed shade tree',c:'#15803d'},park:{i:'🌳',l:'park',c:'#15803d'}};
@@ -688,7 +701,7 @@ function nearestCool(s){const g=buildGraph(),hf=heatFactor(),T=coolTargets(),dis
   dist[s]=0;push(0,s);let hit=-1;while(H.length){const[d,v]=pop();if(d>dist[v])continue;if(T.has(v)){hit=v;break}for(let j=g.deg[v];j<g.deg[v+1];j++){const u=g.adj[j],nd=d+g.w[j]*hf[j];if(nd<dist[u]){dist[u]=nd;prev[u]=v;push(nd,u)}}}
   if(hit<0)return null;const path=[];for(let v=hit;v!==-1;v=prev[v])path.push(v);path.reverse();
   let len=0;for(let i=1;i<path.length;i++)len+=Math.hypot((g.lon[path[i]]-g.lon[path[i-1]])*101200,(g.lat[path[i]]-g.lat[path[i-1]])*110900);return{path,len,site:T.get(hit)}}
-$('bcool').onclick=()=>{coolMode=true;routeMode=false;$('bcool').classList.add('on');map2&&(map2.getCanvas().style.cursor='crosshair');toast('Click anywhere: the walker heads to the nearest shade ☂')};
+$('bcool').onclick=()=>{coolMode=true;routeMode=false;$('bcool').classList.add('on');map2&&(map2.getCanvas().style.cursor='crosshair');toast('Click anywhere: the walker heads to the nearest tree shade 🌳')};
 function coolClick(ll){coolMode=false;setRouteActive(true);$('bcool').classList.remove('on');map2.getCanvas().style.cursor='';
   mk.forEach(m=>m.remove());mk=[pin(ll,'A','#22d3ee')];map2.getSource('rplan').setData({type:'FeatureCollection',features:[]});const g=buildGraph(),r=nearestCool(snapNode(ll));
   if(!r){$('rinfo').innerHTML='No cool spot reachable from here.';return}
@@ -699,7 +712,7 @@ function coolClick(ll){coolMode=false;setRouteActive(true);$('bcool').classList.
     <ul class="pts" style="margin:8px 0 0"><li>Nearest shade: <b>${SK[r.site.k].i} ${SK[r.site.k].l}</b>${r.site.name?' · <span dir="auto">'+esc(r.site.name)+'</span>':''}</li><li>The walker waits under it, out of the sun</li><li>Route prefers cooler streets lined with proposed trees</li></ul>`;
   map2.fitBounds(co.reduce((a,c)=>[Math.min(a[0],c[0]),Math.min(a[1],c[1]),Math.max(a[2],c[0]),Math.max(a[3],c[1])],[180,90,-180,-90]),{padding:{top:120,bottom:120,left:120,right:300},maxZoom:17.5,pitch:45,duration:1400});
   map2.once('moveend',()=>animateWalker(co,[],SK[r.site.k].i+' In the shade'))}
-// shade plan for any custom route: new umbrella wherever >=100 m without shade, trees both sides every 15 m on sun-exposed parts
+// shade plan for any custom route: trees both sides every 8 m (measured Madinah crown) on sun-exposed parts; umbrellas optional
 let RPLAN=null,rpOpt='both',BLD=null;
 function bldIndex(){if(BLD)return BLD;const o=D.graph.o,C=0.001,grid=new Map(),RR=D.bld.map(a=>{const r=[];for(let i=0;i<a.length;i+=2)r.push([o[0]+a[i]/1e5,o[1]+a[i+1]/1e5]);return r});
   RR.forEach((r,i)=>{let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;r.forEach(([x,y])=>{x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)});
@@ -707,14 +720,14 @@ function bldIndex(){if(BLD)return BLD;const o=D.graph.o,C=0.001,grid=new Map(),R
 function inBld(x,y){const B=bldIndex(),l=B.grid.get(Math.floor(x/B.C)+','+Math.floor(y/B.C));if(!l)return false;
   for(const i of l){const r=B.R[i];let c=false;for(let a=0,b=r.length-1;a<r.length;b=a++){if(((r[a][1]>y)!==(r[b][1]>y))&&(x<(r[b][0]-r[a][0])*(y-r[a][1])/(r[b][1]-r[a][1])+r[a][0]))c=!c}if(c)return true}return false}
 function edgeHW(a,b){const g=buildGraph();for(let j=g.deg[a];j<g.deg[a+1];j++)if(g.adj[j]===b)return g.ehw[j];return 3}
-// tree every 10 m on both kerbs (road half-width + 2.5 m), never on a building, carriageway or junction corner;
+// tree every 8 m on both kerbs (road half-width + 2.5 m), never on a building, carriageway or junction corner;
 // umbrella wherever the walker would be >= 100 m (~1.5 min) without any shade
 function routePlan(path){const g=buildGraph(),U=[],T=[];let acc=0,since=0,lastT=-1e9,have=0;
   for(let i=1;i<path.length;i++){const A=path[i-1],B=path[i],x0=g.lon[A],y0=g.lat[A],x1=g.lon[B],y1=g.lat[B],dxm=(x1-x0)*101200,dym=(y1-y0)*110900,L=Math.hypot(dxm,dym);
     if(L<0.01)continue;const off=edgeHW(A,B)+2.5,px=-dym/L,py=dxm/L,n=Math.max(1,Math.ceil(L/5)),jA=g.deg[A+1]-g.deg[A]>=3,jB=g.deg[B+1]-g.deg[B]>=3;
     for(let k=1;k<=n;k++){const f=k/n,x=x0+(x1-x0)*f,y=y0+(y1-y0)*f,d=acc+L*f;
       if(shadeNear(x,y,20))since=0;else{since+=L/n;if(since>=100){for(const sg of[1,-1]){const c=[x+sg*px*off/101200,y+sg*py*off/110900];if(!inBld(c[0],c[1])){U.push({c,d});since=0;break}}}}
-      if(d-lastT>=10&&!(jA&&L*f<10)&&!(jB&&L*(1-f)<10)){lastT=d;for(const sg of[1,-1]){const c=[x+sg*px*off/101200,y+sg*py*off/110900];if(inBld(c[0],c[1]))continue;if(shadeNear(c[0],c[1],6))have++;else T.push(c)}}}
+      if(d-lastT>=(P.tree_sp||8)&&!(jA&&L*f<10)&&!(jB&&L*(1-f)<10)){lastT=d;for(const sg of[1,-1]){const c=[x+sg*px*off/101200,y+sg*py*off/110900];if(inBld(c[0],c[1]))continue;if(shadeNear(c[0],c[1],6))have++;else T.push(c)}}}
     acc+=L}
   return{U,T,have}}
 function showRoutePlan(){if(!m2Ready||!RPLAN)return;const f=[];if(rpOpt!=='t')RPLAN.U.forEach(u=>f.push({type:'Feature',properties:{k:'u'},geometry:{type:'Point',coordinates:u.c}}));
@@ -741,20 +754,18 @@ function routeClick(ll){
   const F=analyse(rf,false),C=analyse(rc,true);
   map2.getSource('route').setData({type:'FeatureCollection',features:[...F.feats,...C.feats]});
   map2.getSource('rmin').setData({type:'FeatureCollection',features:C.mins});
-  C.stops.forEach(s=>{const el=document.createElement('div');el.className='pin';el.style.cssText='background:#0e7490;width:22px;height:22px;font-size:12px;border-width:1.5px';el.textContent='☂';el.title=`Shade stop · ${fmt(s.t,1)} min`;mk.push(new maplibregl.Marker({element:el}).setLngLat(s.c).addTo(map2))});
-  const mn=x=>x/SPEED_MS/60,cco=rc.path.map(i=>[g.lon[i],g.lat[i]]);RPLAN=routePlan(rc.path);rpOpt='both';
+  C.stops.forEach(s=>{const el=document.createElement('div');el.className='pin';el.style.cssText='background:#15803d;width:22px;height:22px;font-size:12px;border-width:1.5px';el.textContent='🌳';el.title=`Shade stop · ${fmt(s.t,1)} min`;mk.push(new maplibregl.Marker({element:el}).setLngLat(s.c).addTo(map2))});
+  const mn=x=>x/SPEED_MS/60,cco=rc.path.map(i=>[g.lon[i],g.lat[i]]);RPLAN=routePlan(rc.path);rpOpt='t';
   const allStops=[...C.stops,...RPLAN.U.map(u=>({c:u.c,k:'umb',d:u.d,t:u.d/SPEED_MS/60,nw:1}))].sort((a,b)=>a.d-b.d);
   $('rinfo').innerHTML=`<table class="plan"><tr><th></th><th>Time</th><th>Distance</th><th>In hot zone</th></tr>
     <tr><td><span class="sw l" style="display:inline-block;width:14px;background:#94a3b8;vertical-align:middle"></span> Fastest</td><td>${fmt(mn(F.len),1)}′</td><td>${fmt(F.len)} m</td><td style="color:#f43f5e">${fmt(100*F.hot/Math.max(1,F.len))}%</td></tr>
     <tr><td><span class="sw l" style="display:inline-block;width:14px;background:#22c55e;vertical-align:middle"></span> <b>Cool route</b></td><td>${fmt(mn(C.len),1)}′</td><td>${fmt(C.len)} m</td><td style="color:#22c55e"><b>${fmt(100*C.hot/Math.max(1,C.len))}%</b></td></tr></table>
-    <div class="route"><div><b style="color:#67e8f9">${C.stops.length}</b><span>☂ shade stops on cool route</span></div><div><b style="color:#f43f5e">${fmt(F.sun,1)}′</b><span>longest walk in sun · fastest</span></div><div><b style="color:#22c55e">${fmt(C.sun,1)}′</b><span>longest walk in sun · cool</span></div></div>
+    <div class="route"><div><b style="color:#67e8f9">${C.stops.length}</b><span>🌳 shade stops on cool route</span></div><div><b style="color:#f43f5e">${fmt(F.sun,1)}′</b><span>longest walk in sun · fastest</span></div><div><b style="color:#22c55e">${fmt(C.sun,1)}′</b><span>longest walk in sun · cool</span></div></div>
     <div style="margin-top:8px">Cool route: ${fmt(Math.max(0,F.hot-C.hot))} m less hot‑zone walking for <b>+${fmt(mn(C.len-F.len),1)} min</b>.</div>
     <div class="card" style="margin-top:10px;background:#0f1a24"><b>🛠 Shade plan for this route</b>
-      <div class="big2" style="margin:8px 0"><div style="background:linear-gradient(135deg,#0e3a4a,#103040);padding:8px"><b style="font-size:22px">${fmt(RPLAN.U.length)}</b><span>new ☂ umbrellas<br>+ ${C.stops.length} already planned</span></div>
-      <div style="background:linear-gradient(135deg,#123d24,#0f2e1d);padding:8px"><b style="font-size:22px">${fmt(RPLAN.T.length)}</b><span>new 🌳 trees · every 10 m<br>both kerbs (+ ${fmt(RPLAN.have)} already planned)</span></div></div>
-      <div class="subtabs" id="rpopt" style="margin:0"><button data-o="u" onclick="setRP('u')">☂ Umbrellas</button><button data-o="t" onclick="setRP('t')">🌳 Trees</button><button data-o="both" class="on" onclick="setRP('both')">Both</button></div>
-      <div class="s" style="font-size:11.5px;color:var(--mut);margin-top:6px">Trees on the kerb‑side strip (road half‑width + 2.5 m), not on the road, a building or a junction corner. With the ☂ the longest walk in the sun drops to ≤ ${fmt(100/SPEED_MS/60,1)} min.</div></div>
-    <div class="note">☂ shade stop = a proposed umbrella from Map 01 within 20 m of the route; the walker pauses under each. "Longest walk in sun" = longest stretch with no proposed umbrella / tree nearby.</div>`;
+      <div class="big2" style="margin:8px 0;grid-template-columns:1fr"><div style="background:linear-gradient(135deg,#123d24,#0f2e1d);padding:8px"><b style="font-size:22px">${fmt(RPLAN.T.length)}</b><span>new 🌳 trees · every ${fmt(P.tree_sp||8,0)} m<br>both kerbs (+ ${fmt(RPLAN.have)} already planned)</span></div></div>
+      <div class="s" style="font-size:11.5px;color:var(--mut);margin-top:6px">Trees on the kerb‑side strip (road half‑width + 2.5 m), not on the road, a building or a junction corner.</div></div>
+    <div class="note">🌳 shade stop = a proposed tree from Map 01 within 20 m of the route; the walker pauses under one every ≥ 60 m. "Longest walk in sun" = longest stretch with no proposed tree nearby.</div>`;
   const co=[...rf.path,...rc.path].map(i=>[g.lon[i],g.lat[i]]);
   const b=co.reduce((a,c)=>[Math.min(a[0],c[0]),Math.min(a[1],c[1]),Math.max(a[2],c[0]),Math.max(a[3],c[1])],[180,90,-180,-90]);
   map2.fitBounds(b,{padding:{top:100,bottom:100,left:100,right:300},maxZoom:17.5,pitch:40,duration:1500});
@@ -797,7 +808,7 @@ function loop(now){
 requestAnimationFrame(loop);
 
 // ---------- shared controls ----------
-let cur='v1',is3D1=false,is3D2=true,base='dark';
+let cur='v1',is3D1=false,is3D2=true,base='sat';
 function switchView(v){if(cur===v)return;cur=v;
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.v===v));document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on',s.id===v));
   if(v==='v2'){if(!map2)initMap2();else map2.resize();setTimeout(()=>map2.resize(),60);startPlay()}else map1.resize();
@@ -817,11 +828,12 @@ $('bpng').onclick=()=>{const m=cur==='v1'?map1:map2;if(!m)return;
   m.once('render',()=>{const src=m.getCanvas(),W=src.width,H=src.height,r=W/src.clientWidth;const c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');g.drawImage(src,0,0);
     g.fillStyle='rgba(11,16,22,.88)';g.fillRect(0,0,W,70*r);g.fillStyle='#e8eef5';g.font=`800 ${22*r}px Inter`;g.fillText(cur==='v1'?'Madinah · Priority Areas for Cooling':'Madinah · Major Pedestrian Movement Patterns',18*r,32*r);
     g.fillStyle='#8d9bb0';g.font=`500 ${13*r}px Inter`;g.fillText('Open-source analysis · OSM (Geofabrik) · network walk model · '+S.generated,18*r,54*r);
-    const items=cur==='v1'?[5,4,3,2,1].map(k=>[CPI_COL[k],CPI_LBL[k]]).concat([[UMB,'Cooling perimeter / umbrella'],[TREE,'Shade tree'],['#5eead4','Walkway'],['#4ade80','Park']]):[5,4,3,2].map(k=>[PMI_COL[k],'PMI '+PMI_LBL[k]]).concat([['#ffffff','Corridor'],['#ffd166','Walk to Haram'],['#22c55e','Cool route A→B'],['#f43f5e','Route in hot zone']]);
+    const items=cur==='v1'?[5,4,3,2,1].map(k=>[CPI_COL[k],CPI_LBL[k]]).concat([[UMB,'Cooling perimeter'],[TREE,'Shade tree'],['#5eead4','Walkway'],['#4ade80','Park']]):[5,4,3,2].map(k=>[PMI_COL[k],'PMI '+PMI_LBL[k]]).concat([['#ffffff','Corridor'],['#ffd166','Walk to Haram'],['#22c55e','Cool route A→B'],['#f43f5e','Route in hot zone']]);
     const lh=22*r,bw=230*r,bh=(items.length+1)*lh+10*r,x0=W-bw-16*r,y0=H-bh-40*r;g.fillStyle='rgba(17,24,33,.92)';g.fillRect(x0,y0,bw,bh);
     g.fillStyle='#e8eef5';g.font=`700 ${13*r}px Inter`;g.fillText(cur==='v1'?'Cooling Priority':'Pedestrian Movement',x0+12*r,y0+20*r);
     items.forEach(([col,l],i)=>{g.fillStyle=col;g.fillRect(x0+12*r,y0+(i+1)*lh+8*r,16*r,11*r);g.fillStyle='#d5dde8';g.font=`500 ${12*r}px Inter`;g.fillText(l,x0+36*r,y0+(i+1)*lh+18*r)});
     const a=document.createElement('a');a.download=(cur==='v1'?'Madinah_Cooling_Priority':'Madinah_Pedestrian_Movement')+'.png';a.href=c.toDataURL('image/png');a.click();toast('PNG exported')});m.triggerRepaint()};
+document.querySelectorAll('.ptog').forEach(x=>{const off=document.body.classList.contains('nopanel');x.textContent=off?'▶':'◀';x.title=off?'Show panel':'Hide panel'});
 document.querySelectorAll('.ptog').forEach(b=>b.onclick=()=>{const off=document.body.classList.toggle('nopanel');
   document.querySelectorAll('.ptog').forEach(x=>{x.textContent=off?'▶':'◀';x.title=off?'Show panel':'Hide panel'});
   const t0=performance.now();(function rs(){[map1,map2].forEach(m=>m&&m.resize());if(performance.now()-t0<350)requestAnimationFrame(rs)})()});

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 Madinah – Cooling Priority (Task 5) + Pedestrian Movement (Task 6)
-Madinah_City.gdb + Geofabrik se web data banata hai aur HTML map likhta hai.
+Builds the web data from Madinah_City.gdb + Geofabrik and writes the HTML map.
 RUN (ArcGIS Pro python):
   "C:\\Program Files\\ArcGIS\\Pro\\bin\\Python\\envs\\arcgispro-py3\\python.exe" build_web_data.py
-Output: Madinah_Cooling_Pedestrian_Maps.html (isi folder me)
+Output: Madinah_Cooling_Pedestrian_Maps.html (in this folder)
 """
 import arcpy, os, json, datetime
 import numpy as np
@@ -67,7 +67,8 @@ city = next(r[0] for r in arcpy.da.SearchCursor(BND, ["SHAPE@"], spatial_referen
 city_area = city.area / 1e6
 
 # =================== HEXAGONS ===================
-HEX = os.path.join(GDB, "Pedestrian_Movement_Hex")
+# 1 km cells (500 m radius from the centre, 86.6 ha hexagon cells), aggregated from the 250 m (5 ha) PMI grid by make_cells_1km.py (area-weighted mean)
+HEX = os.path.join(ROOT, "Madinah_Analysis.gdb", "Pedestrian_Movement_Cell_1km")
 oids, cx, cy, area, pmi, pcls, wsc, dsc, bsc = [], [], [], [], [], [], [], [], []
 with arcpy.da.SearchCursor(HEX, ["OID@", "SHAPE@XY", "SHAPE@AREA", "PMI", "PMI_Class",
                                  "Walk_Score", "Dest_Score", "Built_Score"]) as sc:
@@ -472,9 +473,13 @@ if gjs:
     pc["net_file"] = os.path.basename(gjs[-1]); pc["net_n"] = len(pcnet["features"]); pc["cross_n"] = pc_cross_n
     log(f"PedestrianCatch network: {len(pcnet['features'])} segments, crossings {pc_cross_n}")
 
-# =================== SHADE DEMAND -> UMBRELLAS (100 m2) & TREES (200 m2) ===================
+# =================== SHADE DEMAND -> UMBRELLAS (100 m2) & TREES (53 m2 mean Madinah crown) ===================
 import math
-UMB_M2, TREE_M2 = 100.0, 200.0
+# Tree crown: mean crown area of 40,800 single trees measured in Madinah on the Meta/WRI 1 m canopy height map
+# (Tolan et al. 2024; canopy >= 3 m, isolated crowns 4-400 m2): mean 53 m2, median 28 m2, mean diameter 7.2 m.
+# Spacing = diameter of a 53 m2 crown (8.2 m) rounded to 8 m, so crowns meet at maturity (continuous shade).
+UMB_M2, TREE_M2 = 100.0, 53.0
+TREE_SP = 8.0
 TARGET = {5: 0.60, 4: 0.45, 3: 0.30, 2: 0.15, 1: 0.0}     # shade coverage target by priority tier
 CAP_M2 = {"Mosque": 2000, "School": 1500, "Mall": 3000, "Bus": 300, "Park": 3000}  # per-site max shade demand
 WALK_WIDTH = 3.0
@@ -494,7 +499,7 @@ from matplotlib.path import Path as MPath
 import collections
 log("Umbrella suitability ...")
 GRID = 8.0
-SPACING_U, SPACING_T = 14.0, 16.0
+SPACING_U, SPACING_T = 14.0, TREE_SP
 SUIT_MIN, SUIT_TREE, SUIT_SHOW = 55, 45, 35
 HARAM_EXIST_M = 420      # Masjid an-Nabawi + its plaza (~400 m from centre) already has 250 large umbrellas
 SUN_AZ = 255.0          # summer sun 14-16 h from WSW: west/south side of a building is hottest
@@ -716,7 +721,9 @@ for i in order:
         U = pick(ids, req, SUIT_MIN, SPACING_U, storeU)
         if s["cat"] == "Bus" and not U:          # at least 1 shelter at every bus stop (best open sidewalk cell)
             U = pick(ids, 1, 1, SPACING_U, storeU)
-        Tt = pick(ids, math.ceil(len(U) * UMB_M2 / TREE_M2), SUIT_TREE, SPACING_T, storeT)
+        suitT = ids[S[ids] >= SUIT_TREE] if len(ids) else ids
+        reqT = 0 if nab else math.ceil(min(len(suitT) * cell * tgt * frac, CAP_M2[s["cat"]]) / TREE_M2)
+        Tt = pick(ids, reqT, SUIT_TREE, SPACING_T, storeT)
         for k in U: rec(k, s, "park" if e["kind"] == "park" else "perimeter", umb_pts)
         for k in Tt: rec(k, s, "park" if e["kind"] == "park" else "perimeter", tree_pts)
         zone = e["ring"].area if e.get("ring") is not None else s.get("area", 0)
@@ -729,7 +736,7 @@ for i in order:
     elif e["kind"] == "walk":
         iv = WALK_INTERVAL[e["c"]]
         U = pick(ids, len(ids), 50, SPACING_U, storeU, gap=iv)   # 1 umbrella per iv metres, counting every nearby umbrella
-        Tt = pick(ids, math.ceil(len(U) * UMB_M2 / TREE_M2), SUIT_TREE, SPACING_T, storeT)
+        Tt = pick(ids, len(ids), SUIT_TREE, SPACING_T, storeT)     # trees every 8 m along the walkway
         for k in U: rec(k, s, "walkway", umb_pts)
         for k in Tt: rec(k, s, "walkway", tree_pts)
         walk_dem["umb"] += len(U); walk_dem["tree"] += len(Tt); walk_dem["m2"] += len(U) * 100
@@ -748,11 +755,14 @@ for _el in ("perimeter", "park", "junction", "crossing", "walkway"):
     if m_.any(): log(f"  QA nearest-umbrella distance [{_el}]: min {_nd[m_,1].min():.0f} m, median {np.median(_nd[m_,1]):.0f} m, n={m_.sum()}")
 
 # ---------------- LONG-TERM STREET TREE PROGRAMME ----------------
-# both kerbs of every walkable street in High+ cooling zones, every 15 m (200 m2 crown ~ 16 m -> continuous canopy)
-ST_SP, ST_OFF, ST_MIN_CPI = 15.0, 2.5, 3
+# Both kerbs of every walkable street in the city. Tree spacing follows the cooling priority class:
+# spacing = crown diameter (8 m) / target kerb shade cover. Critical 100 %, Very High 80 %, High 67 %, Moderate 50 %, Low 33 %.
+# (Target cover per class is a planning assumption; the 8 m crown is measured, see TREE_M2.)
+ST_SP_CLS = {5: 8.0, 4: 10.0, 3: 12.0, 2: 16.0, 1: 24.0, 0: 24.0}
+ST_SP, ST_OFF, ST_MIN_CPI = TREE_SP, 2.5, 3
 log("Street trees ...")
 jtree = cKDTree(_jxy) if len(_jxy) else None
-cand, ckm = [], 0.0
+cand, ckm, km_cls = [], 0.0, {}
 with arcpy.da.SearchCursor(rd_all, ["SHAPE@", "fclass"], spatial_reference=SR_UTM) as sc:
     for shp, fc in sc:
         if shp is None or fc in FOOT or fc in ("motorway", "motorway_link", "trunk", "trunk_link", "service", "unknown") \
@@ -762,11 +772,11 @@ with arcpy.da.SearchCursor(rd_all, ["SHAPE@", "fclass"], spatial_reference=SR_UT
             P = np.array([(q.X, q.Y) for q in part if q])
             if len(P) < 2: continue
             seg = np.hypot(*np.diff(P, axis=0).T); cum = np.r_[0, np.cumsum(seg)]
-            if cum[-1] < ST_SP: continue
             mid = P[len(P) // 2]
-            if int(ccls[int(tree.query(mid)[1])]) < ST_MIN_CPI: continue
-            ckm += cum[-1] / 1000
-            d = np.arange(ST_SP / 2, cum[-1], ST_SP)
+            c_ = int(ccls[int(tree.query(mid)[1])]); sp_ = ST_SP_CLS[c_]
+            if cum[-1] < sp_: continue
+            ckm += cum[-1] / 1000; km_cls[c_] = km_cls.get(c_, 0) + cum[-1] / 1000
+            d = np.arange(sp_ / 2, cum[-1], sp_)
             k = np.clip(np.searchsorted(cum, d) - 1, 0, len(seg) - 1)
             f = (d - cum[k]) / np.maximum(seg[k], 1e-6)
             X = P[k, 0] + (P[k + 1, 0] - P[k, 0]) * f; Y = P[k, 1] + (P[k + 1, 1] - P[k, 1]) * f
@@ -783,7 +793,6 @@ if jtree is not None:
 dd, jj = rtree.query(SP_, k=12, distance_upper_bound=40)
 v_ = np.isfinite(dd); jj_ = np.where(v_, jj, 0)
 ok &= ~(v_ & (rh[jj_] > 0) & (dd < rh[jj_] + 1.0)).any(1)          # not on another road's carriageway
-_, hi_ = tree.query(SP_); ok &= ccls[hi_] >= ST_MIN_CPI
 if otree is not None:
     od, _ = otree.query(SP_); ok &= od > 8                          # tree already exists
 SP_ = SP_[ok]
@@ -799,18 +808,18 @@ if len(hitb): keep[hitb] = False
 SP_ = SP_[keep]
 street_pts = []
 for x, y in SP_:
-    if free(x, y, 10.0, storeT): put(x, y, 10.0, storeT); street_pts.append((float(x), float(y)))
+    if free(x, y, TREE_SP, storeT): put(x, y, TREE_SP, storeT); street_pts.append((float(x), float(y)))
 _, shi = tree.query(np.array(street_pts))
-st_by_cls = {c: int((ccls[shi] == c).sum()) for c in range(3, 6)}
+st_by_cls = {c: int((ccls[shi] == c).sum()) for c in range(0, 6)}
 log(f"  street trees {len(street_pts)}  by CPI class {st_by_cls}  (excluded building {len(hitb)})")
-STF = os.path.join(AGDB, "Proposed_Street_Trees_200m2")
-arcpy.management.CreateFeatureclass(AGDB, "Proposed_Street_Trees_200m2", "POINT", spatial_reference=SR_UTM)
+STF = os.path.join(AGDB, "Proposed_Street_Trees")
+arcpy.management.CreateFeatureclass(AGDB, "Proposed_Street_Trees", "POINT", spatial_reference=SR_UTM)
 arcpy.management.AddField(STF, "CPI_Class", "SHORT")
 with arcpy.da.InsertCursor(STF, ["SHAPE@XY", "CPI_Class"]) as ic:
     for (x, y), c in zip(street_pts, ccls[shi]): ic.insertRow([(x, y), int(c)])
 
 # write GDB layers + CSV
-for nm, pts in [("Proposed_Umbrellas_100m2", umb_pts), ("Proposed_Shade_Trees_200m2", tree_pts)]:
+for nm, pts in [("Proposed_Umbrellas_100m2", umb_pts), ("Proposed_Site_Trees", tree_pts)]:
     fc = os.path.join(AGDB, nm)
     arcpy.management.CreateFeatureclass(AGDB, nm, "POINT", spatial_reference=SR_UTM)
     for f_, t_ in [("element", "TEXT"), ("category", "TEXT"), ("site_name", "TEXT"), ("CPI_Class", "SHORT"),
@@ -833,7 +842,7 @@ plan_csv = os.path.join(ROOT, "Action_Requirement_Plan.csv")
 with open(plan_csv, "w", newline="", encoding="utf-8-sig") as fh:
     w = csv.writer(fh)
     w.writerow(["Rank", "Category", "Name", "Priority tier", "Priority score", "Zone m2", "Suitable open space m2",
-                "Shade m2", "Umbrellas (100 m2) short-term", "Shade trees (200 m2) long-term", "Note"])
+                "Shade m2", "Umbrellas (100 m2) short-term", "Shade trees (53 m2 crown) long-term", "Note"])
     for k, r in enumerate(sorted(plan, key=lambda r: -r["score"]), 1):
         w.writerow([k, r["cat"], r["name"], CLABEL[r["tier"]], r["score"], r["zone_m2"], r["suit_m2"], r["demand_m2"],
                     r["umbrellas"], r["trees"], r["note"]])
@@ -845,8 +854,8 @@ with open(plan_csv, "w", newline="", encoding="utf-8-sig") as fh:
     w.writerow(["", "Road junctions (major road in High+ zone, all in Critical)", sum(junc_n.values()), "", "", "", "",
                 sum(junc_umb.values()) * 100, sum(junc_umb.values()), "",
                 "1 corner umbrella per junction (3+ vehicle-road arms) where open sidewalk space exists"])
-    w.writerow(["", "Street trees long-term (High+ zones, both sides)", f"{ckm:.0f} km", "", "", "", "",
-                len(street_pts) * 200, "", len(street_pts), f"every {ST_SP:.0f} m, {ST_OFF} m outside kerb; not at junctions / Haram plaza"])
+    w.writerow(["", "Street trees long-term (all zones, both sides)", f"{ckm:.0f} km", "", "", "", "",
+                round(len(street_pts) * TREE_M2), "", len(street_pts), f"every 8-24 m by priority, {ST_OFF} m outside kerb; not at junctions / Haram plaza"])
 
 def to_wgs_many(xy):
     out = []
@@ -882,7 +891,7 @@ summ["Crossing"] = {"sites": sum(1 for e in elems if e["kind"] == "cross"), "m2"
 _ju = sum(junc_umb.values())
 summ["Junction"] = {"sites": sum(junc_n.values()), "m2": _ju * 100, "umb": _ju, "tree": 0, "covered": junc_skip["covered"], "nospace": junc_skip["nospace"]}
 log(f"  junctions skipped: {junc_skip}")
-summ["StreetTree"] = {"sites": None, "km": round(ckm), "m2": len(street_pts) * 200, "umb": 0, "tree": len(street_pts)}
+summ["StreetTree"] = {"sites": None, "km": round(ckm), "m2": round(len(street_pts) * TREE_M2), "umb": 0, "tree": len(street_pts)}
 plan_top = [dict(r, tl=CLABEL[r["tier"]]) for r in sorted(plan, key=lambda r: -r["score"])[:40]]
 
 # =================== ROUTING GRAPH (browser A->B walking time) ===================
@@ -916,8 +925,21 @@ with arcpy.da.SearchCursor(bld, ["SHAPE@"], spatial_reference=SR_WGS) as sc:
             bld_rings.append([v for x, y in r0 for v in (int(round((x - LON0) * 1e5)), int(round((y - LAT0) * 1e5)))])
 log(f"Buildings exported: {len(bld_rings)} rings")
 # WRI / Engel et al. 2026 air-temp assumption: -0.33 C per +10 pp canopy
-hot_area_m2 = float(((ccls >= ST_MIN_CPI).sum()) * area.mean())     # High+ zones (street tree programme area)
-tree_canopy_m2 = (len(tree_pts) + len(street_pts)) * TREE_M2
+# canopy added and air cooling per priority class (trees counted in the class where they stand)
+_all_t = np.array([(p[0], p[1]) for p in tree_pts] + list(street_pts))
+_, _thi = tree.query(_all_t)
+_tcls = ccls[_thi]
+tiers = {}
+for c in range(0, 6):
+    a_ = float((ccls == c).sum() * area.mean())
+    n_ = int((_tcls == c).sum())
+    pp_ = 100 * n_ * TREE_M2 / a_ if a_ else 0
+    tiers[c] = {"sp": ST_SP_CLS[c], "km": round(km_cls.get(c, 0)), "n": n_, "km2": round(a_ / 1e6, 1),
+                "canopy_pp": round(pp_, 2), "dT": round(-0.33 * pp_ / 10, 2)}
+    log(f"  tier {c}: spacing {ST_SP_CLS[c]} m, {n_} trees, +{pp_:.2f} pp canopy, air {-0.33*pp_/10:.2f} C")
+hot = _tcls >= ST_MIN_CPI
+hot_area_m2 = float(((ccls >= ST_MIN_CPI).sum()) * area.mean())     # High+ zones
+tree_canopy_m2 = int(hot.sum()) * TREE_M2
 canopy_pp = 100 * tree_canopy_m2 / hot_area_m2
 air_dT = -0.33 * canopy_pp / 10
 ped_space_m2 = perim_area * 1e6 + walk_dem["km"] * 1000 * WALK_WIDTH + (cross_umb + _ju) * 100
@@ -929,6 +951,7 @@ log(f"Graph nodes {N} edges {len(edge_q)//2}  multipoint {len(_wl)}")
 def to_wgs(g): return g.projectAs(SR_WGS)
 
 hex_feats = []
+tree_ha = np.bincount(_thi, minlength=len(oids)) / (area / 1e4)   # proposed trees per hectare
 with arcpy.da.SearchCursor(HEX, ["OID@", "SHAPE@"], spatial_reference=SR_WGS) as sc:
     for o, shp in sc:
         i = idx[o]
@@ -939,7 +962,7 @@ with arcpy.da.SearchCursor(HEX, ["OID@", "SHAPE@"], spatial_reference=SR_WGS) as
                                          "p": round(float(pmi[i]), 3), "pc": int(pcls[i]),
                                          "s": round(float(sens_n[i]), 2), "sh": round(float(shade_def[i]), 2),
                                          "w": round(float(wsc[i]), 2), "d": round(float(dsc[i]), 2),
-                                         "b": round(float(bsc[i]), 2), "g": round(float(gshare[i]), 2)}})
+                                         "b": round(float(bsc[i]), 2), "g": round(float(gshare[i]), 2), "t": round(float(tree_ha[i]), 1)}})
 
 def site_props(s):
     return {"cat": s["cat"], "name": s["name"], "c": s["ccls"], "v": round(s["cpi"], 3),
@@ -1020,7 +1043,32 @@ stats = {
     "generated": datetime.date.today().isoformat(),
 }
 
+# ---- display zones: 600 m circles around each 1 km cell centre overlap their neighbours (centres 1 km apart,
+# so 577 m closes every gap); circles of the same class are dissolved; where classes overlap the higher class wins.
+ZONE_R = 600.0
+def zones(cls_arr, mask):
+    out, higher = [], None
+    for c in range(5, 0, -1):
+        sel = np.where(mask & (cls_arr == c))[0]
+        if not len(sel): continue
+        g = None
+        for i in sel:
+            b = arcpy.PointGeometry(arcpy.Point(float(cx[i]), float(cy[i])), SR_UTM).buffer(ZONE_R)
+            g = b if g is None else g.union(b)
+        if higher is not None: g = g.difference(higher)
+        higher = g if higher is None else higher.union(g)
+        w = g.densify("DISTANCE", 40, 0.5).projectAs(SR_WGS)
+        for poly in ring_coords(w):
+            out.append({"type": "Feature", "properties": {"c": c}, "geometry": {"type": "Polygon", "coordinates": poly}})
+    return out
+_act = (cpi > 0) | (pmi > 0)
+zcpi = zones(ccls, _act & (ccls >= 1))
+_tb = np.digitize(tree_ha, [0.01, 2, 5, 10, 20])          # 1: <2, 2: 2-5, 3: 5-10, 4: 10-20, 5: 20+ trees/ha
+ztree = zones(_tb, _act & (_tb >= 1))
+log(f"Zones: CPI {len(zcpi)} polygons, tree density {len(ztree)} polygons")
+
 data = {"stats": stats, "hex": {"type": "FeatureCollection", "features": hex_feats},
+        "zcpi": {"type": "FeatureCollection", "features": zcpi}, "ztree": {"type": "FeatureCollection", "features": ztree},
         "sites": {"type": "FeatureCollection", "features": site_feats},
         "perim": {"type": "FeatureCollection", "features": perim_feats},
         "fp": {"type": "FeatureCollection", "features": fp_feats},
@@ -1040,7 +1088,7 @@ data = {"stats": stats, "hex": {"type": "FeatureCollection", "features": hex_fea
         "trees_p": {"type": "FeatureCollection", "features": tree_feats},
         "plan": {"summary": summ, "top": plan_top, "target": TARGET, "cap": CAP_M2,
                  "tot_umb": len(umb_pts), "tot_tree": len(tree_pts) + len(street_pts), "site_tree": len(tree_pts),
-                 "street": {"n": len(street_pts), "km": round(ckm), "sp": ST_SP, "by": st_by_cls},
+                 "street": {"n": len(street_pts), "km": round(ckm), "sp": ST_SP, "by": st_by_cls}, "tiers": tiers, "crown_m2": TREE_M2, "tree_sp": TREE_SP,
                  "site": {str(r["id"]): [r["umbrellas"], r["trees"], r["suit_m2"], r["note"]] for r in plan if r.get("id") is not None},
                  "canopy_pp": round(canopy_pp, 2), "air_dT": round(air_dT, 2), "hot_km2": round(hot_area_m2 / 1e6, 1),
                  "ped_m2": round(ped_space_m2), "shade_m2": round(shade_m2),
