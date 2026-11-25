@@ -315,7 +315,18 @@ let m1Ready=false,cat1On=new Set(Object.keys(CAT)),topCat='all',pulse1=false,sha
 // suitability cells + minute labels (compact arrays -> GeoJSON)
 const SUIT={type:'FeatureCollection',features:[]};{const o=D.suit.o,p=D.suit.p;for(let i=0;i<p.length;i+=3)SUIT.features.push({type:'Feature',properties:{s:p[i+2]},geometry:{type:'Point',coordinates:[o[0]+p[i]/1e5,o[1]+p[i+1]/1e5]}})}
 const CMIN={type:'FeatureCollection',features:[]};{const o=D.cmin.o,p=D.cmin.p,K='hbmsl';for(let i=0;i<p.length;i+=4)CMIN.features.push({type:'Feature',properties:{m:p[i+2],k:K[p[i+3]]},geometry:{type:'Point',coordinates:[o[0]+p[i]/1e5,o[1]+p[i+1]/1e5]}})}
-const STREE={type:'FeatureCollection',features:[]};{const o=D.stree.o,p=D.stree.p;for(let i=0;i<p.length;i+=2)STREE.features.push({type:'Feature',properties:{},geometry:{type:'Point',coordinates:[o[0]+p[i]/1e5,o[1]+p[i+1]/1e5]}})}
+// street trees: compact arrays + 0.01 deg grid index; maps load only the trees in view
+const ST=(()=>{const o=D.stree.o,p=D.stree.p,n=p.length/2,X=new Float64Array(n),Y=new Float64Array(n),G=new Map(),C=0.01,B=new Map(),BC=0.00075;
+  for(let i=0;i<n;i++){const x=o[0]+p[2*i]/1e5,y=o[1]+p[2*i+1]/1e5;X[i]=x;Y[i]=y;const k=Math.floor(x/C)+','+Math.floor(y/C);(G.get(k)||G.set(k,[]).get(k)).push(i);
+    const bk=Math.floor(x/BC)+','+Math.floor(y/BC);B.set(bk,(B.get(bk)||0)+1)}
+  const heat={type:'FeatureCollection',features:[]};B.forEach((c,k)=>{const [a,b]=k.split(',').map(Number);heat.features.push({type:'Feature',properties:{n:c},geometry:{type:'Point',coordinates:[(a+0.5)*BC,(b+0.5)*BC]}})});
+  return{n,X,Y,G,C,heat}})();
+const EMPTY={type:'FeatureCollection',features:[]};
+function treesInView(m,minz){if(m.getZoom()<minz)return EMPTY;const b=m.getBounds(),C=ST.C,out=[];
+  for(let a=Math.floor(b.getWest()/C);a<=Math.floor(b.getEast()/C);a++)for(let c=Math.floor(b.getSouth()/C);c<=Math.floor(b.getNorth()/C);c++){const l=ST.G.get(a+','+c);if(!l)continue;
+    for(const i of l){const x=ST.X[i],y=ST.Y[i];if(x>=b.getWest()&&x<=b.getEast()&&y>=b.getSouth()&&y<=b.getNorth())out.push({type:'Feature',properties:{},geometry:{type:'Point',coordinates:[x,y]}})}}
+  return{type:'FeatureCollection',features:out}}
+function bindTrees(m,src,minz){let t=0;const up=()=>{clearTimeout(t);t=setTimeout(()=>{const s=m.getSource(src);if(s)s.setData(treesInView(m,minz))},120)};m.on('moveend',up);up()}
 const TRC=(D.ctrips||[]).map((t,i)=>{const p=[];let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(let k=0;k<t.p.length;k+=2){const x=39.3+t.p[k]/1e5,y=24.2+t.p[k+1]/1e5;p.push([x,y]);x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}
   const dur=Math.max(1,t.t[t.t.length-1]);return{p,t:t.t,dur,off:(i*97.31)%(dur+30),h:1,bb:[x0,y0,x1,y1]}});
 const SUIT_COL=['interpolate',['linear'],['get','s'],35,'#334155',55,'#f59e0b',75,'#22d3ee',95,'#a5f3fc'];
@@ -462,8 +473,8 @@ map1.on('load',()=>{
   map1.addLayer({id:'suit',type:'circle',source:'suit',minzoom:14.5,layout:{visibility:'none'},paint:{'circle-radius':mRad(3.6),'circle-color':SUIT_COL,'circle-opacity':['interpolate',['linear'],['zoom'],14.5,0,15.5,0.55]}});
   map1.addLayer({id:'umbheat',type:'heatmap',source:'umb',maxzoom:14.5,layout:{visibility:'none'},paint:{'heatmap-radius':['interpolate',['linear'],['zoom'],9,4,14,18],'heatmap-intensity':['interpolate',['linear'],['zoom'],9,0.5,14,1.2],
     'heatmap-color':['interpolate',['linear'],['heatmap-density'],0,'rgba(0,0,0,0)',0.15,'rgba(14,116,144,.45)',0.4,'#22d3ee',0.7,'#a5f3fc',1,'#ffffff'],'heatmap-opacity':['interpolate',['linear'],['zoom'],12,0.85,14.5,0]}});
-  map1.addSource('stree',{type:'geojson',data:STREE});
-  map1.addLayer({id:'streeheat',type:'heatmap',source:'stree',maxzoom:14.2,layout:{visibility:'none'},paint:{'heatmap-weight':0.35,'heatmap-radius':['interpolate',['linear'],['zoom'],9,3,11,5,13,9,14.2,12],'heatmap-intensity':['interpolate',['linear'],['zoom'],9,0.04,11,0.07,13,0.16,14.2,0.3],'heatmap-color':['interpolate',['linear'],['heatmap-density'],0,'rgba(0,0,0,0)',0.25,'rgba(0,0,0,0)',0.4,'rgba(22,163,74,.45)',0.6,'rgba(74,222,128,.75)',0.8,'#bbf7d0',1,'#f0fdf4'],'heatmap-opacity':['interpolate',['linear'],['zoom'],11,0.9,13.4,0.8,14.2,0]}});
+  map1.addSource('stree',{type:'geojson',data:EMPTY});map1.addSource('streeagg',{type:'geojson',data:ST.heat});bindTrees(map1,'stree',12.8);
+  map1.addLayer({id:'streeheat',type:'heatmap',source:'streeagg',maxzoom:14.2,layout:{visibility:'none'},paint:{'heatmap-weight':['*',0.6,['get','n']],'heatmap-radius':['interpolate',['linear'],['zoom'],9,3,11,5,13,9,14.2,12],'heatmap-intensity':['interpolate',['linear'],['zoom'],9,0.04,11,0.07,13,0.16,14.2,0.3],'heatmap-color':['interpolate',['linear'],['heatmap-density'],0,'rgba(0,0,0,0)',0.25,'rgba(0,0,0,0)',0.4,'rgba(22,163,74,.45)',0.6,'rgba(74,222,128,.75)',0.8,'#bbf7d0',1,'#f0fdf4'],'heatmap-opacity':['interpolate',['linear'],['zoom'],11,0.9,13.4,0.8,14.2,0]}});
   map1.addLayer({id:'stree',type:'circle',source:'stree',minzoom:13,layout:{visibility:'none'},paint:{'circle-radius':['interpolate',['exponential',2],['zoom'],13,1.2,15,1.4,17,3.77,22,120.8],'circle-color':TREE,'circle-opacity':0.45,'circle-stroke-color':'#bbf7d0','circle-stroke-width':['interpolate',['linear'],['zoom'],15,0,17,0.8]}});
   map1.addLayer({id:'tree',type:'circle',source:'trees_p',minzoom:12,layout:{visibility:'none'},paint:{'circle-radius':['interpolate',['exponential',2],['zoom'],12,2.2,15,2.4,17,3.77,22,120.8],'circle-color':TREE,'circle-opacity':0.55,'circle-stroke-color':'#bbf7d0','circle-stroke-width':1}});
   map1.addLayer({id:'umb',type:'circle',source:'umb',minzoom:12,layout:{visibility:'none'},paint:{'circle-radius':['interpolate',['exponential',2],['zoom'],12,1.8,15,2.8,17,5.19,22,166.1],'circle-color':['match',['get','e'],'j','#fbbf24','c','#fde047','w','#5eead4',UMB],'circle-opacity':0.35,'circle-stroke-color':'#e0f7ff','circle-stroke-width':['interpolate',['linear'],['zoom'],13,0.4,18,1.6]}});
@@ -545,7 +556,7 @@ function initMap2(){if(map2)return;map2=mkMap('map2');
     map2.addLayer({id:'cmin5',type:'symbol',source:'cmin',minzoom:11.5,filter:['==',['get','m'],-1],layout:{...mtxt,'text-size':['interpolate',['linear'],['zoom'],12,10,16,13],'symbol-sort-key':0},paint:mpaint});
     map2.addLayer({id:'cmin1',type:'symbol',source:'cmin',minzoom:14,filter:['==',['get','m'],-1],layout:{...mtxt,'text-size':10.5},paint:mpaint});
     map2.addSource('rplan',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
-    map2.addSource('umb2',{type:'geojson',data:D.umb});map2.addSource('stree2',{type:'geojson',data:STREE});
+    map2.addSource('umb2',{type:'geojson',data:D.umb});map2.addSource('stree2',{type:'geojson',data:EMPTY});bindTrees(map2,'stree2',14.3);
     map2.addLayer({id:'stree2',type:'circle',source:'stree2',minzoom:14.5,paint:{'circle-radius':['interpolate',['exponential',2],['zoom'],14.5,1.6,17,3.77,22,120.8],'circle-color':'#22c55e','circle-opacity':0.35}});
     map2.addLayer({id:'umb2',type:'circle',source:'umb2',minzoom:14,paint:{'circle-radius':['interpolate',['exponential',2],['zoom'],14,1.8,17,5.19,22,166.1],'circle-color':UMB,'circle-opacity':0.6,'circle-stroke-color':'#e0f7ff','circle-stroke-width':0.8}});
     addPedIcons(map2);
@@ -648,7 +659,7 @@ function shortest(s,t,cool){const g=buildGraph(),hf=cool?heatFactor():null,dist=
 // ---- proposed shade (umbrellas + trees) used by the walk model ----
 let SH=null;
 function shadeIndex(){if(SH)return SH;const pts=[];D.trees_p.features.forEach(f=>pts.push({c:f.geometry.coordinates,k:'tree'}));
-  STREE.features.forEach(f=>pts.push({c:f.geometry.coordinates,k:'tree'}));
+  for(let i=0;i<ST.n;i++)pts.push({c:[ST.X[i],ST.Y[i]],k:'tree'});
   const C=0.0005,grid=new Map();pts.forEach((p,i)=>{const key=Math.floor(p.c[0]/C)+','+Math.floor(p.c[1]/C);(grid.get(key)||grid.set(key,[]).get(key)).push(i)});return SH={pts,grid,C}}
 function shadeNear(lon,lat,r,onlyUmb){const s=shadeIndex(),cx=Math.floor(lon/s.C),cy=Math.floor(lat/s.C);let best=-1,bd=r;
   for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++)(s.grid.get((cx+a)+','+(cy+b))||[]).forEach(i=>{if(onlyUmb&&s.pts[i].k!=='umb')return;const p=s.pts[i].c,d=Math.hypot((p[0]-lon)*101200,(p[1]-lat)*110900);if(d<bd){bd=d;best=i}});return best<0?null:{i:best,d:bd,p:s.pts[best]}}
