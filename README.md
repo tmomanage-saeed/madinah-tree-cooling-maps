@@ -1,4 +1,4 @@
-# Madinah Heat Analysis: Cooling Priority & Street Trees (Tasks 5 & 6), v3
+# Madinah: Cooling Priority & Street Trees (Tasks 5 & 6), v3
 
 This repo holds two interactive web maps built from open data: OpenStreetMap / Geofabrik, the Meta/WRI 1 m canopy height map, and a walking network model.
 
