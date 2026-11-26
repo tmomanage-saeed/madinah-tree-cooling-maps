@@ -405,7 +405,7 @@ function applyUmbFilter(){if(!m1Ready)return;const f=['all',['in',['get','e'],['
   $('nTs').textContent=`${fmt(P.site_tree)} at sites + ${fmt(P.street.n)} street`;
   const TI=P.tiers||{},TL={5:'Critical',4:'Very High',3:'High',2:'Moderate',1:'Low',0:'Outside index'};
   let tn=0,tk=0;
-  $('ptab').innerHTML='<tr><th>Priority</th><th>Tree every</th><th>Kerb shade</th><th>Street km</th><th>🌳 Trees</th></tr>'+[5,4,3,2,1,0].map(c=>{const r=TI[c];if(!r)return'';tn+=r.n;tk+=r.km;
+  $('ptab').innerHTML='<tr><th>Priority</th><th>Tree every</th><th>Footpath in shade</th><th>Street km</th><th>🌳 Trees</th></tr>'+[5,4,3,2,1,0].map(c=>{const r=TI[c];if(!r)return'';tn+=r.n;tk+=r.km;
      return`<tr><td><span class="d" style="display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;background:${CPI_COL[c]||'#64748b'}"></span>${TL[c]}</td><td>${fmt(r.sp,0)} m</td><td>${fmt(100*P.tree_sp/r.sp,0)} %</td><td>${fmt(r.km,0)}</td><td>${fmt(r.n)}</td></tr>`}).join('')+
      `<tr class="tot"><td>Total</td><td></td><td></td><td>${fmt(tk,0)}</td><td>${fmt(tn)}</td></tr>`;
   const zeroLow=Object.values(P.site).filter(v=>v[0]===0&&!v[3]).length,noSpace=Object.values(P.site).filter(v=>v[0]===0&&/^No suitable/.test(v[3])).length,inHaram=Object.values(P.site).filter(v=>v[0]===0&&/Haram/.test(v[3])).length,J=P.summary.Junction;
@@ -460,7 +460,7 @@ function priorityCard(p){const TI=(P.tiers||{})[p.c]||{},rk=VSORT.findIndex(v=>v
    <div class="s">Rank ${fmt(rk)} of ${fmt(VSORT.length)} areas (top ${top} %)</div>
    ${bar('Places people use',p.s,'#2dd4bf')}${bar('People walking',p.p,'#ffd166')}${bar('Missing shade',p.sh,'#f59342')}
    <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:12px"><b>🌳 Tree plan for this cell</b>
-   ${row('Proposed trees',fmt(n)+' ('+fmt(p.t,1)+' / ha)')}${row('Tree every',fmt(TI.sp||0,0)+' m, both kerbs')}${row('Kerb shade when mature',fmt(100*P.tree_sp/(TI.sp||1),0)+' %')}
+   ${row('Proposed trees',fmt(n)+' ('+fmt(p.t,1)+' / ha)')}${row('Tree every',fmt(TI.sp||0,0)+' m, both kerbs')}${row('Footpath in shade (mature trees)',fmt(100*P.tree_sp/(TI.sp||1),0)+' %')}
    ${row('Air cooler ('+CPI_LBL[p.c]+' zones)',fmt(Math.abs(TI.dT||0),2)+' °C')}</div>`}
 function renderTop(){
   const q=($('q1').value||'').trim().toLowerCase();
