@@ -401,7 +401,7 @@ function applyUmbFilter(){if(!m1Ready)return;const f=['all',['in',['get','e'],['
     <tr><td>Haram plaza</td><td>420 m excluded</td><td>Existing large umbrellas already shade it</td></tr>
     <tr><td>Walking speed</td><td>1.1 m/s</td><td>Checked against PedestrianCatch: ±2 min for 94 % of points</td></tr>
     <tr><td>Air cooling</td><td>0.33 °C / +10 % canopy</td><td>WRI / Engel et al. 2026</td></tr></table>
-    <div class="note">All rules are in <code>build_web_data.py</code>. Change a value and re-run to get new counts.</div>`;
+    `;
   $('m1').innerHTML=`<div class="formula">CPI = 40% Sensitive uses + 35% Pedestrian movement + 25% Shade deficit</div>
    <ul class="pts" style="margin:0"><li><b>Sensitive uses</b>: 300 m kernel · Haram 10, mosque/school 3, bus/mall 2.5, park 1.5</li>
    <li><b>Shade deficit</b> = 1 − green cover (OSM)</li><li><b>Classes</b>: Critical top 5 % · VH 85–95 % · High 65–85 %</li>
