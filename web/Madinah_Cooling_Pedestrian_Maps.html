@@ -199,17 +199,19 @@ table.plan tr.tot td{color:var(--g);border-top:2px solid var(--g2)}
 .mtitle{background:var(--g2);border:0;border-radius:999px;padding:8px 22px;box-shadow:0 6px 18px #1b5e2040}.mtitle b{color:#fff}.mtitle span{color:#e3f4e4}
 .ptog{background:#fff;color:var(--g2);border-color:var(--line)}.ptog:hover{background:var(--gl)}
 .mopt{border-radius:999px;overflow:hidden}
+#why1 td,#why1 th{text-align:left!important}
 
 .pts b,.method b,.lead b,aside li b{color:var(--g)!important}
 .legend .sw{box-shadow:0 0 0 1px #00000045}
-.pp .b{grid-template-columns:150px 1fr 30px}
+.pp .b{grid-template-columns:112px 1fr 30px}
+.srch{background:#fff!important;color:#1f2a1f!important;border:1px solid var(--line)!important}
 .mtitle{left:calc(410px + (100% - 410px)/2)}body.nopanel .mtitle{left:50%}
 </style>
 </head>
 <body>
 <div class="loader" id="loader"><div class="ring"></div><div style="color:#8d9bb0;font-size:13px">Loading Madinah data…</div></div>
 <header>
-  <div class="brand"><b>Madinah · Cooling &amp; Pedestrian Movement</b><span>Tasks 5 &amp; 6 · open-source data (OSM/Geofabrik) · network walk model</span></div>
+  <div class="brand"><b>Madinah · Cooling &amp; Pedestrian Movement</b><span>Open data · OpenStreetMap · Meta/WRI tree canopy</span></div>
   <div class="tabs">
     <button class="tab on" data-v="v1"><i>01</i>Cooling Priority Areas</button>
     <button class="tab" data-v="v2"><i>02</i>Pedestrian Movement</button>
@@ -225,13 +227,11 @@ table.plan tr.tot td{color:var(--g);border-top:2px solid var(--g2)}
 
 <section class="view on" id="v1">
   <aside>
-    <div class="kicker">Map 01 · Task 5</div>
+    <div class="kicker">Map 01</div>
     <h1>Priority Areas for Cooling</h1>
     <ul class="pts">
-      <li><b>Where:</b> mosques · schools · bus · malls · parks · walkways · junctions</li>
-      <li><b>Zone:</b> 20 m cooling perimeter around each building</li>
-      <li><b>🌳 Trees on every street:</b> more trees where cooling priority is higher</li>
-      <li><b>Crown 53 m²</b>: mean of 40,800 trees measured in Madinah</li>
+      <li><b>🌳 Trees on every street</b>, more where cooling is needed most</li>
+      <li><b>Click</b> any area to see its priority and tree plan</li>
     </ul>
     <div class="onoff" id="optTop"><button data-t="tree" class="on">🌳 Trees <i>ON</i></button></div>
     <div class="kpis" id="k1"></div>
@@ -260,13 +260,12 @@ table.plan tr.tot td{color:var(--g);border-top:2px solid var(--g2)}
     <input class="srch" id="q1" placeholder="🔎 Search any mosque / school / mall / park…" dir="auto">
     <div class="subtabs" id="st1"></div>
     <div class="list" id="l1"></div>
-    <h3>Why these numbers? (for the client)</h3>
+    <h3>Why these numbers?</h3>
     <div class="card method" id="why1"></div>
-    <h3>Method</h3>
-    <div class="card method" id="m1"></div>
+    <div id="m1" style="display:none"></div>
   </aside>
   <div class="map" id="map1"></div>
-  <div class="mtitle"><b>❄ Madinah Cooling Map</b><span>Where street trees cool the city · <span id="mtsub"></span></span></div>
+  <div class="mtitle"><b>❄ Madinah Cooling Map</b><span id="mtsub"></span></div>
   <button class="ptog" title="Hide / show panel">◀</button>
   <div class="seg mopt" id="opt2"><button data-o="tree" class="on">🌳 Trees</button><button data-o="none">Off</button></div>
   <div class="legend" id="lg1"></div>
@@ -274,13 +273,11 @@ table.plan tr.tot td{color:var(--g);border-top:2px solid var(--g2)}
 
 <section class="view" id="v2">
   <aside>
-    <div class="kicker">Map 02 · Task 6</div>
+    <div class="kicker">Map 02</div>
     <h1>Major Pedestrian Movement Patterns</h1>
     <ul class="pts">
-      <li><b>Answer:</b> yes, as a <b>modelled</b> pattern from open data</li>
-      <li><b>Index:</b> footpaths + destinations + built density</li>
-      <li><b>Time:</b> real walking minutes on the OSM network</li>
-      <li><b>Explore:</b> click anywhere to see walking minutes from that spot</li>
+      <li><b>Where people walk</b>, modelled from open data</li>
+      <li><b>Click</b> anywhere to see walking minutes</li>
     </ul>
     <div class="kpis" id="k2"></div>
     <h3>Point‑to‑point walking time</h3>
@@ -305,8 +302,7 @@ table.plan tr.tot td{color:var(--g);border-top:2px solid var(--g2)}
     <div class="toggles" id="t2"></div>
     <h3>Cross‑check · PedestrianCatch</h3>
     <div class="card method" id="pcbox"></div>
-    <h3>Method</h3>
-    <div class="card method" id="m2"></div>
+    <div id="m2" style="display:none"></div>
   </aside>
   <div class="map" id="map2"></div>
   <button class="ptog" title="Hide / show panel">◀</button>
@@ -397,13 +393,13 @@ function applyUmbFilter(){if(!m1Ready)return;const f=['all',['in',['get','e'],['
 (function(){
   const c=S.cpi_km2,hiSites=Object.values(S.cats).reduce((a,b)=>a+b.hi,0);
   kpis($('k1'),[
-    {v:fmt(c[5]+c[4],1),u:'km²',l:'Critical + Very High cooling priority area',k:'#c0134f'},
-    {v:fmt(S.perim_n),l:`Building cooling perimeters · ${fmt(S.perim_km2,2)} km² (${fmt(S.perim_fp)} from real footprints)`,k:UMB},
-    {v:fmt(hiSites),u:'sites',l:'Mosques, schools, bus, malls &amp; parks in the top‑25 % tier',k:'#f59342'},
-    {v:fmt(P.summary.Walkway.km,0),u:'km',l:'Priority walkways needing shade (CPI High+)',k:'#2dd4bf'}]);
+    {v:fmt(c[5]+c[4],1),u:'km²',l:'Highest priority area',k:'#c0134f'},
+    {v:fmt(S.perim_n),l:'Buildings with a cooling zone',k:UMB},
+    {v:fmt(hiSites),u:'sites',l:'Top priority sites',k:'#f59342'},
+    {v:fmt(P.summary.Walkway.km,0),u:'km',l:'Walkways needing shade',k:'#2dd4bf'}]);
   $('cpiArea').textContent=fmt(Object.values(c).reduce((a,b)=>a+b,0))+' km² active';
   distRows($('d1'),[5,4,3,2,1].map(k=>({l:CPI_LBL[k],c:CPI_COL[k],v:S.cpi_counts[k],t:fmt(c[k],1)+' km²'})),Math.max(...Object.values(S.cpi_counts)));
-  countUp($('nU'),P.tot_umb);countUp($('nT'),P.tot_tree);$('mtsub').textContent=`${fmt(P.tot_tree)} proposed shade trees · air up to ${fmt(Math.abs(P.air_dT),2)} °C cooler in High+ zones`;
+  countUp($('nU'),P.tot_umb);countUp($('nT'),P.tot_tree);$('mtsub').textContent=`${fmt(P.tot_tree)} new shade trees · up to ${fmt(Math.abs(P.air_dT),2)} °C cooler`;
   const rows=[['Mosque','Mosques'],['School','Schools'],['Bus','Bus stations'],['Mall','Shopping malls'],['Park','Parks'],['Walkway','Walkways'],['Junction','Road junctions'],['Crossing','Ped. crossings'],['StreetTree','Street trees (long‑term)']];
   let tu=0,tt=0,tm=0;
   $('nTs').textContent=`${fmt(P.site_tree)} at sites + ${fmt(P.street.n)} street`;
@@ -414,12 +410,8 @@ function applyUmbFilter(){if(!m1Ready)return;const f=['all',['in',['get','e'],['
      `<tr class="tot"><td>Total</td><td></td><td></td><td>${fmt(tk,0)}</td><td>${fmt(tn)}</td></tr>`;
   const zeroLow=Object.values(P.site).filter(v=>v[0]===0&&!v[3]).length,noSpace=Object.values(P.site).filter(v=>v[0]===0&&/^No suitable/.test(v[3])).length,inHaram=Object.values(P.site).filter(v=>v[0]===0&&/Haram/.test(v[3])).length,J=P.summary.Junction;
   $('pnote').innerHTML=`<ul class="pts" style="margin:0;font-size:11.5px">
-    <li><b>🌳 Crown 53 m²</b> (≈ 8 m across): mean of 40,800 single trees measured in Madinah (Meta/WRI 1 m canopy map).</li>
-    <li><b>Spacing</b> = 8 m crown ÷ target kerb shade: Critical 8 m (crowns touch) → Low 24 m.</li>
-    <li>Trees counted include ${fmt(P.site_tree)} at mosques, schools, bus, malls, parks and walkways.</li>
-    <li>Trees on the kerb strip (road half‑width + 2.5 m), never on a building, road or junction corner (12 m).</li>
-    <li>Masjid an‑Nabawi and its plaza (420 m): no new trees, the plaza is already shaded.</li>
-    </ul>`;
+    <li><b>Crown 53 m²</b> · one tree every 8–24 m, closer where priority is higher</li>
+    <li>No trees on buildings, roads, junction corners or the Haram plaza</li></ul>`;
   const SW=D.suit_w;
   $('suitbox').innerHTML='';const _sb=`<div class="formula">S = ${SW.heat}% Heat + ${SW.foot}% Footfall<br>&nbsp;&nbsp;+ ${SW.sun}% Sun exposure + ${SW.access}% Access</div>
     <ul class="pts" style="margin:0"><li><b>Heat</b>: cooling priority (CPI) of the spot</li><li><b>Footfall</b>: pedestrian index + waiting (gate, stop, crossing)</li>
@@ -429,7 +421,7 @@ function applyUmbFilter(){if(!m1Ready)return;const f=['all',['in',['get','e'],['
     <div class="note">Zoom in (z15+) to see the 8 m suitability cells; click any ☂ to see <b>why it is there</b>.</div>`;
   $('eff').innerHTML=`<div class="kpis" style="margin:0 0 8px"><div class="kpi" style="--k:#38bdf8"><div class="v">↓ ${fmt(Math.abs(P.air_dT),2)}<small>°C cooler</small></div><div class="l">air in High+ zones (${fmt(P.hot_km2,0)} km²) when the trees are mature: +${fmt(P.canopy_pp,1)} % canopy × 0.33 °C per 10 % (WRI)</div></div></div>
     <table class="plan"><tr><th>Priority</th><th>Canopy added</th><th>Air cooler</th></tr>${[5,4,3,2,1].map(c=>{const r=(P.tiers||{})[c];return r?`<tr><td>${TL[c]}</td><td>+${fmt(r.canopy_pp,1)} %</td><td>${fmt(Math.abs(r.dT),2)} °C</td></tr>`:''}).join('')}</table>
-    <ul class="pts" style="margin:6px 0 0"><li>Under a 🌳 the <b>felt heat</b> drops much more than the air, because direct sun is blocked.</li><li><b>Next:</b> SOLWEIG before/after UTCI at top sites</li></ul>`;
+`;
   ['opt','opt2'].forEach(id=>$(id).querySelectorAll('button').forEach(b=>b.onclick=()=>{shadeOpt=b.dataset.o;syncShadeUI();applyShade()}));
   $('optTop').querySelectorAll('button').forEach(b=>b.onclick=()=>{let u=shadeOpt==='umb'||shadeOpt==='both',t=shadeOpt==='tree'||shadeOpt==='both';
     t=!t;shadeOpt=t?'tree':'none';syncShadeUI();applyShade()});
@@ -448,15 +440,12 @@ function applyUmbFilter(){if(!m1Ready)return;const f=['all',['in',['get','e'],['
   $('st1').innerHTML=tabs.map(([k,l])=>`<button data-k="${k}" class="${k==='all'?'on':''}">${l}</button>`).join('');
   $('st1').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('st1').querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');topCat=b.dataset.k;renderTop()});
   renderTop();
-  $('why1').innerHTML=`<table class="plan"><tr><th>Rule</th><th>Value</th><th>Basis</th></tr>
-    <tr><td>Tree crown</td><td>53 m² (≈ 8 m)</td><td>Measured: mean of 40,800 single tree crowns in Madinah, Meta/WRI 1 m canopy height map (Tolan et al. 2024). Median 28 m², middle half 13–64 m².</td></tr>
-    <tr><td>Species</td><td>Neem, Sidr, Ficus, Tabebuia</td><td>Species Madinah Municipality allocated for streets (Al‑Watan, 24 Oct 2021); Sidr and Ficus also on the MEWA native list. Neem crown up to 10 m (World Agroforestry).</td></tr>
-    <tr><td>Tree spacing</td><td>8 / 10 / 12 / 16 / 24 m</td><td>8 m crown ÷ target kerb shade (100 / 80 / 67 / 50 / 33 %) for Critical → Low. Target shares are a planning assumption.</td></tr>
-    <tr><td>Junction corner</td><td>no tree within 12 m</td><td>Keeps the sight triangle clear for drivers</td></tr>
-    <tr><td>Haram plaza</td><td>420 m excluded</td><td>Existing large umbrellas already shade it</td></tr>
-    <tr><td>Walking speed</td><td>1.1 m/s</td><td>Checked against PedestrianCatch: ±2 min for 94 % of points</td></tr>
-    <tr><td>Air cooling</td><td>0.33 °C / +10 % canopy</td><td>WRI / Engel et al. 2026</td></tr></table>
-    `;
+  $('why1').innerHTML=`<table class="plan"><tr><th>Number</th><th>Why</th></tr>
+    <tr><td>Priority</td><td>Places people use (40 %) + people walking (35 %) + missing shade (25 %)</td></tr>
+    <tr><td>Tree size 53 m²</td><td>Average of 40,800 real trees in Madinah</td></tr>
+    <tr><td>Tree every 8–24 m</td><td>More trees where priority is higher</td></tr>
+    <tr><td>−0.33 °C per +10 % trees</td><td>WRI research</td></tr>
+    <tr><td>Walking 1.1 m/s</td><td>Checked with PedestrianCatch</td></tr></table>`;
   $('m1').innerHTML=`<div class="formula">CPI = 40% Sensitive uses + 35% Pedestrian movement + 25% Shade deficit</div>
    <ul class="pts" style="margin:0"><li><b>Sensitive uses</b>: 300 m kernel · Haram 10, mosque/school 3, bus/mall 2.5, park 1.5</li>
    <li><b>Shade deficit</b> = 1 − green cover (OSM)</li><li><b>Classes</b>: Critical top 5 % · VH 85–95 % · High 65–85 %</li>
@@ -468,9 +457,8 @@ const VSORT=D.hex.features.map(f=>f.properties.v).filter(v=>v>0).sort((a,b)=>b-a
 function priorityCard(p){const TI=(P.tiers||{})[p.c]||{},rk=VSORT.findIndex(v=>v<=p.v)+1,top=Math.max(1,Math.round(100*rk/VSORT.length)),n=Math.round(p.t*86.6);
   const row=(l,v)=>`<div style="display:flex;justify-content:space-between;margin-top:3px"><span>${l}</span><b>${v}</b></div>`;
   return`<h5>Cooling priority: <span style="color:${CPI_COL[p.c]}">${CPI_LBL[p.c]}</span></h5>
-   <div class="s">1 km cell · CPI ${(+p.v).toFixed(2)} · rank ${fmt(rk)} of ${fmt(VSORT.length)} (top ${top} %)</div>
-   <div style="font-size:11.5px;color:var(--mut);margin-top:6px">Why: CPI = 40 % sensitive uses + 35 % pedestrians + 25 % shade deficit</div>
-   ${bar('Sensitive uses (40 %)',p.s,'#2dd4bf')}${bar('Pedestrian movement (35 %)',p.p,'#ffd166')}${bar('Shade deficit (25 %)',p.sh,'#f59342')}
+   <div class="s">Rank ${fmt(rk)} of ${fmt(VSORT.length)} areas (top ${top} %)</div>
+   ${bar('Places people use',p.s,'#2dd4bf')}${bar('People walking',p.p,'#ffd166')}${bar('Missing shade',p.sh,'#f59342')}
    <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:12px"><b>🌳 Tree plan for this cell</b>
    ${row('Proposed trees',fmt(n)+' ('+fmt(p.t,1)+' / ha)')}${row('Tree every',fmt(TI.sp||0,0)+' m, both kerbs')}${row('Kerb shade when mature',fmt(100*P.tree_sp/(TI.sp||1),0)+' %')}
    ${row('Air cooler ('+CPI_LBL[p.c]+' zones)',fmt(Math.abs(TI.dT||0),2)+' °C')}</div>`}
