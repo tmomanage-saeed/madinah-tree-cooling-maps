@@ -149,6 +149,61 @@ body.nopanel aside{transform:translateX(-100%)}body.nopanel .map{left:0}body.nop
   .brand span,.tab i{display:none}.tools .hide-s{display:none}.legend{display:none}
   header{gap:8px;padding:0 8px}.tab{padding:7px 9px;font-size:12px}
 }
+
+/* ===== Green theme (white header, dark-green section bars, white rounded cards) ===== */
+:root{--bg:#eef2ec;--panel:#ffffff;--panel2:#ffffff;--line:#d5e0d3;--tx:#1f2a1f;--mut:#5d6b5c;--acc:#1e7b34;--g:#1b5e20;--g2:#2e7d32;--gl:#e8f3e7}
+html,body{background:var(--bg);color:var(--tx)}
+header{background:#fff;border-bottom:1px solid var(--line);box-shadow:0 2px 10px #0000000f}
+.brand b{color:var(--g)}.brand span{color:var(--mut)}
+.tab{background:#fff;color:#2d3a2d;border:1px solid var(--line);border-radius:999px}
+.tab i{background:var(--gl);color:var(--g)}
+.tab.on{background:var(--g2);border-color:var(--g2);color:#fff;box-shadow:0 4px 14px #1b5e2033}.tab.on i{background:#ffffff33;color:#fff}
+.btn,.seg button{background:#fff;color:#2d3a2d;border-color:var(--line)}
+.btn:hover{border-color:var(--g2)}.btn.on,.seg button.on{background:var(--g2);color:#fff;border-color:var(--g2)}
+.seg{border-color:var(--line)}
+aside{background:#f6f8f5;border-right:1px solid var(--line)}
+aside::-webkit-scrollbar-thumb{background:#b9cbb6}
+.kicker{color:var(--g2)}
+h1{color:var(--g)}
+.lead,.pts{color:#33413a}
+h3{background:var(--g);color:#fff;padding:10px 12px;border-radius:6px;font-size:13.5px;letter-spacing:.2px;text-transform:none;margin:18px 0 8px;box-shadow:0 2px 6px #1b5e2026}
+h3:before{content:"▸";margin-right:6px;font-size:11px;opacity:.9}h3{justify-content:flex-start}h3 span{color:#d9f0da;margin-left:auto}h3 .btn{margin-left:auto;padding:3px 9px}
+.kpi,.card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 2px 8px #1b5e2012}
+.kpi .v{color:var(--g2)}.kpi .l{color:#4a5a49}
+.dbar{background:#e6eee5}
+.chip{background:#fff;border-color:var(--line);color:#2d3a2d}
+.item{background:#fff;border:1px solid #e1e9df}.item:hover{border-color:var(--g2)}
+.subtabs button{background:#fff;color:#2d3a2d;border-color:var(--line);border-radius:999px;padding:5px 11px}
+.subtabs button.on{background:var(--g2);color:#fff;border-color:var(--g2)}
+.method{color:#33413a}
+.method code,.formula{background:var(--gl);border-color:#cfe3cd;color:var(--g)}
+.note{border-left-color:var(--g2);color:#4a5a49}
+table.plan th{color:var(--g);border-bottom:2px solid #cfe3cd}
+table.plan td{border-bottom:1px solid #e6eee5}
+table.plan tr.tot td{color:var(--g);border-top:2px solid var(--g2)}
+.big2 div{color:#fff}
+.route div{background:var(--gl)}
+.card[style*="0f1a24"]{background:#f3f9f2!important}
+.onoff button{background:#fff;color:#2d3a2d;border-color:var(--line)}.onoff button i{background:#e3e9e2;color:#5d6b5c}
+.onoff button.on[data-t=tree]{background:var(--gl);border-color:var(--g2);color:var(--g)}.onoff button.on[data-t=tree] i{background:var(--g2);color:#fff}
+.tg input,.play input[type=range]{accent-color:var(--g2)}
+.legend{background:#ffffffef;border:1px solid var(--line);box-shadow:0 8px 24px #0000002a;color:var(--tx)}
+.legend h4{color:var(--g)}.lg{color:#2d3a2d}.legend [style*="d5dde8"]{color:#2d3a2d!important}
+.maplibregl-popup-content{background:#fff;color:var(--tx);border:1px solid var(--line);box-shadow:0 10px 28px #00000033}
+.maplibregl-popup-tip{border-top-color:#fff!important;border-bottom-color:#fff!important}
+.pp h5{color:var(--g)}.pp .b .t{background:#e6eee5}
+.pp b[style*="#ffd166"]{color:#b7791f!important}.pp b[style*="#a3e635"]{color:#3f8f1f!important}.pp b[style*="#8d9bb0"]{color:#6b7a6a!important}
+.maplibregl-ctrl-group{background:#fff;border:1px solid var(--line)}.maplibregl-ctrl-group button span{filter:none}
+.maplibregl-ctrl-attrib{background:#ffffffcc!important;color:#5d6b5c}.maplibregl-ctrl-attrib a{color:#5d6b5c}
+.maplibregl-ctrl-scale{background:#ffffffcc;color:#2d3a2d;border-color:#5d6b5c}
+.mtitle{background:var(--g2);border:0;border-radius:999px;padding:8px 22px;box-shadow:0 6px 18px #1b5e2040}.mtitle b{color:#fff}.mtitle span{color:#e3f4e4}
+.ptog{background:#fff;color:var(--g2);border-color:var(--line)}.ptog:hover{background:var(--gl)}
+.mopt{border-radius:999px;overflow:hidden}
+
+.pts b,.method b,.lead b,aside li b{color:var(--g)!important}
+.legend .sw{box-shadow:0 0 0 1px #00000045}
+.pp .b{grid-template-columns:150px 1fr 30px}
+.mtitle{left:calc(410px + (100% - 410px)/2)}body.nopanel .mtitle{left:50%}
 </style>
 </head>
 <body>
