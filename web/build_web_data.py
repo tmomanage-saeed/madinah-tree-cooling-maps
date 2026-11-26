@@ -1065,10 +1065,12 @@ _act = (cpi > 0) | (pmi > 0)
 zcpi = zones(ccls, _act & (ccls >= 1))
 _tb = np.digitize(tree_ha, [0.01, 2, 5, 10, 20])          # 1: <2, 2: 2-5, 3: 5-10, 4: 10-20, 5: 20+ trees/ha
 ztree = zones(_tb, _act & (_tb >= 1))
+zpmi = zones(pcls, _act & (pcls >= 2))          # Map 02: PMI zones, same method
 log(f"Zones: CPI {len(zcpi)} polygons, tree density {len(ztree)} polygons")
 
 data = {"stats": stats, "hex": {"type": "FeatureCollection", "features": hex_feats},
         "zcpi": {"type": "FeatureCollection", "features": zcpi}, "ztree": {"type": "FeatureCollection", "features": ztree},
+        "zpmi": {"type": "FeatureCollection", "features": zpmi},
         "sites": {"type": "FeatureCollection", "features": site_feats},
         "perim": {"type": "FeatureCollection", "features": perim_feats},
         "fp": {"type": "FeatureCollection", "features": fp_feats},

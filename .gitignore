@@ -10,3 +10,4 @@ web/*
 !web/inject.py
 !index.html
 !web/make_cells_1km.py
+!web/zones_pmi.py

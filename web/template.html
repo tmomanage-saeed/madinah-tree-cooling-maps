@@ -380,7 +380,7 @@ function applyUmbFilter(){if(!m1Ready)return;const f=['all',['in',['get','e'],['
     t=!t;shadeOpt=t?'tree':'none';syncShadeUI();applyShade()});
   $('cat1').innerHTML=Object.entries(CAT).map(([k,v])=>`<div class="chip" data-c="${k}"><span class="d" style="background:${v.c}"></span>${v.l} <span style="color:var(--mut)">${fmt(S.cats[k].n)}</span></div>`).join('');
   $('cat1').querySelectorAll('.chip').forEach(ch=>ch.onclick=()=>{const k=ch.dataset.c;cat1On.has(k)?cat1On.delete(k):cat1On.add(k);ch.classList.toggle('off');applyCat1()});
-  const T=[['hex1','Cooling Priority Index (1 km cells)',1],['perim','Cooling perimeters',1],['fp','Building footprints',1],['walk1','Walkways / plazas',1],['parks1','Parks',1],['cross1','Ped. crossings',1]];
+  const T=[['hex1','Cooling Priority Index (1 km cells)',1],['perim','Cooling perimeters',1],['fp','Building footprints',1],['walk1','Walkways / plazas',1],['parks1','Parks',1]];
   $('t1').innerHTML=T.map(([k,l,on])=>`<label class="tg"><input type="checkbox" data-k="${k}" ${on?'checked':''}>${l}</label>`).join('');
   const UEL={p:['Perimeter','#67e8f9'],j:['Junction','#fbbf24'],c:['Crossing','#fde047'],w:['Walkway','#5eead4']};
   const uc={};D.umb.features.forEach(f=>uc[f.properties.e]=(uc[f.properties.e]||0)+1);
@@ -465,7 +465,7 @@ map1.on('load',()=>{
   map1.addLayer({id:'parks1',type:'fill',source:'parks',paint:{'fill-color':'#4ade80','fill-opacity':0.35,'fill-outline-color':'#4ade80'}});
   map1.addLayer({id:'walk1-glow',type:'line',source:'walk',layout:{visibility:'none'},paint:{'line-color':'#2dd4bf','line-width':['interpolate',['linear'],['zoom'],11,2,17,12],'line-opacity':0.18,'line-blur':3}});
   map1.addLayer({id:'walk1',type:'line',source:'walk',paint:{'line-color':'#5eead4','line-width':['interpolate',['linear'],['zoom'],11,0.7,17,3]}});
-  map1.addLayer({id:'cross1',type:'line',source:'pcnet',minzoom:13.5,filter:['==',['get','w'],1],paint:{'line-color':'#fde047','line-width':['interpolate',['linear'],['zoom'],14,1,18,4],'line-dasharray':[1,1]}});
+  map1.addLayer({id:'cross1',type:'line',source:'pcnet',minzoom:13.5,layout:{visibility:'none'},filter:['==',['get','w'],1],paint:{'line-color':'#fde047','line-width':['interpolate',['linear'],['zoom'],14,1,18,4],'line-dasharray':[1,1]}});
   map1.addLayer({id:'perim-fill',type:'fill',source:'perim',paint:{'fill-color':UMB,'fill-opacity':['interpolate',['linear'],['zoom'],11,0.55,16,0.3]}});
   map1.addLayer({id:'perim-line',type:'line',source:'perim',minzoom:13,paint:{'line-color':'#a5f3fc','line-width':1}});
   map1.addLayer({id:'fp',type:'line',source:'fp',minzoom:13,paint:{'line-color':'#a5f3fc','line-width':0.8,'line-opacity':0.8}});
@@ -504,7 +504,7 @@ map1.on('load',()=>{
 });
 $('lg1').innerHTML=`<h4>Cooling Priority Index</h4>${[5,4,3,2,1].map(k=>`<div class="lg"><span class="sw" style="background:${CPI_COL[k]}"></span>${CPI_LBL[k]}</div>`).join('')}
   <div class="sep"></div><div class="lg"><span class="sw" style="background:${UMB}"></span>Cooling perimeter around building</div>
-  <div class="lg"><span class="sw l" style="background:#5eead4"></span>Walkway / pedestrian zone</div><div class="lg"><span class="sw l" style="background:#fde047"></span>Road crossing (waiting in sun)</div>
+  <div class="lg"><span class="sw l" style="background:#5eead4"></span>Walkway / pedestrian zone</div>
   <div class="lg"><span class="sw" style="background:#4ade80;opacity:.6"></span>Park / green area</div>
   <div class="sep"></div><div class="lg"><span class="sw c" style="background:${TREE}99;border:1px solid #bbf7d0"></span>🌳 shade tree (53 m² crown)</div>
   <div class="lg"><span class="sw" style="background:radial-gradient(#f0fdf4,#4ade80 45%,rgba(22,163,74,.2))"></span>🌳 tree hotspot (zoom in to see each tree)</div>
@@ -536,7 +536,8 @@ function initMap2(){if(map2)return;map2=mkMap('map2');
     map2.addSource('route',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
     map2.addSource('rmin',{type:'geojson',data:{type:'FeatureCollection',features:[]}});
     const pc=['match',['get','pc'],1,PMI_COL[1],2,PMI_COL[2],3,PMI_COL[3],4,PMI_COL[4],5,PMI_COL[5],'#000'];
-    map2.addLayer({id:'hex2',type:'fill',source:'hex',filter:['>=',['get','pc'],2],layout:{visibility:'none'},paint:{'fill-color':pc,'fill-opacity':0.5}},'lbl');
+    if(!map2.getSource('zpmi'))map2.addSource('zpmi',{type:'geojson',data:D.zpmi||{type:'FeatureCollection',features:[]}});
+    map2.addLayer({id:'hex2',type:'fill',source:'zpmi',filter:['>=',['get','c'],2],layout:{visibility:'none'},paint:{'fill-color':['match',['get','c'],1,PMI_COL[1],2,PMI_COL[2],3,PMI_COL[3],4,PMI_COL[4],5,PMI_COL[5],'#000'],'fill-opacity':['interpolate',['linear'],['zoom'],10,0.7,13,0.5,16,0.25]}},'lbl');
     map2.addLayer({id:'hex2-3d',type:'fill-extrusion',source:'hex',filter:['>=',['get','pc'],2],paint:{'fill-extrusion-color':pc,'fill-extrusion-height':['*',['^',['get','p'],2.2],900],'fill-extrusion-opacity':['interpolate',['linear'],['zoom'],11,0.7,13.5,0.45,15,0.08]}},'lbl');
     map2.addLayer({id:'hot',type:'line',source:'hot',paint:{'line-color':'#ffd166','line-width':1.6,'line-dasharray':[2,1.5],'line-opacity':0.9}});
     map2.addLayer({id:'pcnet',type:'line',source:'pcnet',layout:{visibility:'none'},paint:{'line-color':['match',['get','w'],1,'#fde047','#c4b5fd'],'line-width':['interpolate',['linear'],['zoom'],13,0.5,18,2.5],'line-opacity':0.75}});
@@ -825,7 +826,7 @@ function loop(now){
 requestAnimationFrame(loop);
 
 // ---------- shared controls ----------
-let cur='v1',is3D1=false,is3D2=true,base='sat';
+let cur='v1',is3D1=false,is3D2=false,base='sat';
 function switchView(v){if(cur===v)return;cur=v;
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.v===v));document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on',s.id===v));
   if(v==='v2'){if(!map2)initMap2();else map2.resize();setTimeout(()=>map2.resize(),60);startPlay()}else map1.resize();
